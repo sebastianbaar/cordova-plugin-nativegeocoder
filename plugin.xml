@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin id="cordova-plugin-nativegeocoder" version="0.0.1" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+	<name>NativeGeocoder</name>
+    <description>Cordova plugin for native forward and reverse geocoding</description>
+    <license>MIT</license>
+    <keywords>cordova,geocoding,reverse,forward</keywords>
+
+	<js-module name="NativeGeocoder" src="www/NativeGeocoder.js">
+		<clobbers target="nativegeocoder" />
+	</js-module>
+
+    <!-- android -->
+	<platform name="android">
+		<config-file parent="/*" target="res/xml/config.xml">
+			<feature name="NativeGeocoder">
+				<param name="android-package" value="cordova.plugin.nativegeocoder.NativeGeocoder" />
+			</feature>
+		</config-file>
+
+		<config-file parent="/*" target="AndroidManifest.xml">
+            <uses-permission android:name="android.permission.INTERNET" />
+        </config-file>
+
+        <source-file src="src/android/NativeGeocoder.java" target-dir="src/cordova/plugin/nativegeocoder" />
+	</platform>
+
+    <!-- ios -->
+	<platform name="ios">
+		<config-file parent="/*" target="config.xml">
+			<feature name="NativeGeocoder">
+				<param name="ios-package" value="NativeGeocoder" />
+			</feature>
+		</config-file>
+		<source-file src="src/ios/NativeGeocoder.swift" />
+        <framework src="CoreLocation.framework" />
+        
+        <config-file target="*-Info.plist" parent="NSLocationWhenInUseUsageDescription">
+            <string>Using geocoder service</string>
+        </config-file>
+
+        <dependency id="cordova-plugin-add-swift-support" version="1.6.0"/>
+	</platform>
+
+</plugin>

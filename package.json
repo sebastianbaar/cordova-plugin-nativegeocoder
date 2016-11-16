@@ -1,0 +1,27 @@
+{
+  "name": "cordova-plugin-nativegeocoder",
+  "version": "0.0.1",
+  "description": "Cordova plugin for native forward and reverse geocoding",
+  "cordova": {
+    "id": "cordova-plugin-nativegeocoder",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sebastianbaar/cordova-plugin-native-geocoder.git"
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios"
+  ],
+  "author": "Sebastian Baar",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sebastianbaar/cordova-plugin-native-geocoder/issues"
+  },
+  "homepage": "https://github.com/sebastianbaar/cordova-plugin-native-geocoder#readme"
+}
