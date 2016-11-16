@@ -37,9 +37,9 @@ Reverse geocode a given latitude and longitude to find location address.
 ```js
 nativegeocoder.reverseGeocode(success, failure, 52.5072095, 13.1452818);
 function success(result) {
-  alert("The address is " + result.address + " in " + result.countryCode);
+  alert("The address is: \n\n" + result.street + " " + result.houseNumber + ", " + result.postalCode + " " + result.city + " in " + result.countryName + " - " +result.countryCode);
 }
-function failure() {
+function failure(err) {
   alert(JSON.stringify(err));
 }
 ```
@@ -59,9 +59,9 @@ Forward geocode a given address to find coordinates.
 ```js
 nativegeocoder.forwardGeocode(success, failure, "Berlin");
 function success(coordinates) {
-  alert("The coordinates are latitude=" + coordinates.latitude + " and longitude=" + coordinates.longitude);
+  alert("The coordinates are latitude = " + coordinates.latitude + " and longitude = " + coordinates.longitude);
 }
-function failure() {
+function failure(err) {
   alert(JSON.stringify(err));
 }
 ```
