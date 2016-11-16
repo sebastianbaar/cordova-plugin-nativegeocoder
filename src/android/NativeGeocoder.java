@@ -57,23 +57,18 @@ public class NativeGeocoder extends CordovaPlugin {
             List<Address> geoResults = geocoder.getFromLocation(latitude, longitude, 1);
             if (geoResults.size() > 0) {
                 Address address = geoResults.get(0);
-                ArrayList<String> addressFragments = new ArrayList<String>();
-
-                // Fetch the address lines using getAddressLine,
-                // join them, and send them to the thread.
-                int maxLines = address.getMaxAddressLineIndex();
-                for (int i = 0; i < maxLines; i++) {
-                    addressFragments.add(address.getAddressLine(i));
-                }
-
-                String addressStr = TextUtils.join(System.getProperty("line.separator"), addressFragments) + ", " + address.getCountryName();
+                
                 JSONObject resultObj = new JSONObject();
-                resultObj.put("address", addressStr);
+                resultObj.put("street", address.getThoroughfare());
+                resultObj.put("houseNumber", address.getSubThoroughfare());
+                resultObj.put("postalCode", address.getPostalCode());
+                resultObj.put("city", address.getLocality());
+                resultObj.put("countryName", address.getCountryName());
                 resultObj.put("countryCode", address.getCountryCode());
 
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, resultObj));
             } else {
-                PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Cannot get a address.");
+                PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Cannot get an address.");
                 callbackContext.sendPluginResult(r);
             }
         } catch (Exception e) {
@@ -97,14 +92,12 @@ public class NativeGeocoder extends CordovaPlugin {
             try {
                 List<Address> geoResults = geocoder.getFromLocationName(addressString, 1);
                 if (geoResults.size()>0) {
-                    Address addr = geoResults.get(0);
-                    System.out.print(addr);
-                    
-                    JSONObject coordinates = new JSONObject();
-                    coordinates.put("latitude", addr.getLatitude());
-                    coordinates.put("longitude", addr.getLongitude());
+                    Address address = geoResults.get(0);
 
-                    System.out.print(coordinates);
+                    JSONObject coordinates = new JSONObject();
+                    coordinates.put("latitude", address.getLatitude());
+                    coordinates.put("longitude", address.getLongitude());
+
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, coordinates));
                 } else {
                     PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Cannot get a location.");
