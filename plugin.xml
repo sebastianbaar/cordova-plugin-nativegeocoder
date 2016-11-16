@@ -31,6 +31,8 @@
 				<param name="ios-package" value="NativeGeocoder" />
 			</feature>
 		</config-file>
+		<header-file src="src/ios/NativeGeocoder-Bridging-Header.h" />
+
 		<source-file src="src/ios/NativeGeocoder.swift" />
         <framework src="CoreLocation.framework" />
         
