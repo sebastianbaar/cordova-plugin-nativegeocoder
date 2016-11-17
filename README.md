@@ -14,7 +14,7 @@ The iOS part is written in Swift 3 and the [Swift support plugin](https://github
 ## Supported Platforms
 
 - iOS
-- Android
+- Android (works only on native devices)
 
 ## Methods
 
