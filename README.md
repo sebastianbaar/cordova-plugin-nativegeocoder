@@ -11,9 +11,9 @@ cordova plugin add cordova-plugin-nativegeocoder
 ```
 The iOS part is written in Swift 3 and the [Swift support plugin](https://github.com/akofman/cordova-plugin-add-swift-support) is configured as a dependency.
 
-## Demo
+## Ionic Native Demo
 
-Have a look at the [demo](https://github.com/sebastianbaar/cordova-plugin-nativegeocoder/tree/master/demo) project for a working demo.
+Have a look at the [demo](https://github.com/sebastianbaar/cordova-plugin-nativegeocoder/tree/master/demo) project for a working demo with the [Ionic Framework](http://ionicframework.com/) and [Ionic Native](http://ionicframework.com/docs/v2/native/).
 
 ## Supported Platforms
 
