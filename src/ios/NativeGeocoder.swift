@@ -38,6 +38,7 @@ import CoreLocation
                     "houseNumber": address.subThoroughfare ?? "",
                     "postalCode": address.postalCode ?? "",
                     "city": address.locality ?? "",
+                    "district": address.subLocality ?? "",
                     "countryName": address.country ?? "",
                     "countryCode": address.isoCountryCode ?? ""
               ]
