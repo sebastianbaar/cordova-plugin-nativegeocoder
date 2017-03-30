@@ -41,7 +41,7 @@ Reverse geocode a given latitude and longitude to find location address.
 ```js
 nativegeocoder.reverseGeocode(success, failure, 52.5072095, 13.1452818);
 function success(result) {
-  alert("The address is: \n\n" + result.street + " " + result.houseNumber + ", " + result.postalCode + " " + result.city + " in " + result.countryName + " - " +result.countryCode);
+  alert("The address is: \n\n" + result.street + " " + result.houseNumber + ", " + result.postalCode + " " + result.city + " " + result.district + " in " + result.countryName + " - " + result.countryCode);
 }
 function failure(err) {
   alert(JSON.stringify(err));

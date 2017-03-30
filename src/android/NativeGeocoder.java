@@ -63,6 +63,7 @@ public class NativeGeocoder extends CordovaPlugin {
                 resultObj.put("houseNumber", address.getSubThoroughfare());
                 resultObj.put("postalCode", address.getPostalCode());
                 resultObj.put("city", address.getLocality());
+                resultObj.put("district", address.getSubLocality());
                 resultObj.put("countryName", address.getCountryName());
                 resultObj.put("countryCode", address.getCountryCode());
 
