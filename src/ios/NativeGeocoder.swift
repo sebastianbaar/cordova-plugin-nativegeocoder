@@ -2,16 +2,68 @@ import CoreLocation
 
 @objc(NativeGeocoder) class NativeGeocoder : CDVPlugin {
 
-    @objc(reverseGeocode:) func reverseGeocode(command: CDVInvokedUrlCommand) {
+    @objc(reverseGeocode:) func reverseGeocode(_ command: CDVInvokedUrlCommand) {
 
         var pluginResult = CDVPluginResult(
             status: CDVCommandStatus_ERROR
         )
 
-        let latitude = command.arguments[0] as? Double ?? 0
-        let longitude = command.arguments[1] as? Double ?? 0
-
-        if latitude == 0 || longitude == 0 {
+        if let latitude = command.arguments[0] as? Double,
+            let longitude = command.arguments[1] as? Double {
+         
+            let location = CLLocation(latitude: latitude, longitude: longitude)
+            
+            CLGeocoder().reverseGeocodeLocation(location, completionHandler: { placemarks, error in
+                
+                if error == nil {
+                    
+                    if let placemark = placemarks?[0] as CLPlacemark? {
+                        
+                        // https://developer.apple.com/documentation/corelocation/clplacemark
+                        let resultObj: Dictionary = [
+                            "countryCode": placemark.isoCountryCode ?? "",
+                            "countryName": placemark.country ?? "",
+                            "postalCode": placemark.postalCode ?? "",
+                            "administrativeArea": placemark.administrativeArea ?? "",
+                            "subAdministrativeArea": placemark.subAdministrativeArea ?? "",
+                            "locality": placemark.locality ?? "",
+                            "subLocality": placemark.subLocality ?? "",
+                            "thoroughfare": placemark.thoroughfare ?? "",
+                            "subThoroughfare": placemark.subThoroughfare ?? ""
+                        ]
+                        
+                        pluginResult = CDVPluginResult(
+                            status: CDVCommandStatus_OK,
+                            messageAs: resultObj
+                        )
+                        
+                    }
+                    else {
+                        
+                        pluginResult = CDVPluginResult(
+                            status: CDVCommandStatus_ERROR,
+                            messageAs: "Cannot get an address"
+                        )
+                        
+                    }
+                }
+                else {
+                    
+                    pluginResult = CDVPluginResult(
+                        status: CDVCommandStatus_ERROR,
+                        messageAs: "CLGeocoder:reverseGeocodeLocation Error"
+                    )
+                    
+                }
+                
+                self.commandDelegate!.send(
+                    pluginResult,
+                    callbackId: command.callbackId
+                )
+                
+            })
+        }
+        else {
             
             pluginResult = CDVPluginResult(
                 status: CDVCommandStatus_ERROR,
@@ -23,59 +75,72 @@ import CoreLocation
                 callbackId: command.callbackId
             )
             
-        } else {
-
-          let location = CLLocation(latitude: latitude, longitude: longitude)
-
-          CLGeocoder().reverseGeocodeLocation(location, completionHandler: { placemarks, error in
-
-            if error == nil {
-                
-              let address = placemarks![0] as CLPlacemark
-
-              let resultObj = [
-                    "street": address.thoroughfare ?? "",
-                    "houseNumber": address.subThoroughfare ?? "",
-                    "postalCode": address.postalCode ?? "",
-                    "city": address.locality ?? "",
-                    "district": address.subLocality ?? "",
-                    "countryName": address.country ?? "",
-                    "countryCode": address.isoCountryCode ?? ""
-              ]
-     
-              pluginResult = CDVPluginResult(
-                status: CDVCommandStatus_OK,
-                messageAs: resultObj
-              )
-                
-              
-            } else {
-                
-              pluginResult = CDVPluginResult(
-                status: CDVCommandStatus_ERROR,
-                messageAs: "Cannot get an address"
-              )
-                
-            }
-
-            self.commandDelegate!.send(
-              pluginResult,
-              callbackId: command.callbackId
-            )
-            
-          })
         }
   }
 
-  @objc(forwardGeocode:)func forwardGeocode(command: CDVInvokedUrlCommand) {
+  @objc(forwardGeocode:)func forwardGeocode(_ command: CDVInvokedUrlCommand) {
 
     var pluginResult = CDVPluginResult(
       status: CDVCommandStatus_ERROR
     )
-
-    let address = command.arguments[0] as? String ?? ""
     
-    if address.isEmpty {
+    if let address = command.arguments[0] as? String {
+        
+        CLGeocoder().geocodeAddressString(address, completionHandler: { placemarks, error in
+            
+            if error == nil {
+                
+                if let firstPlacemark = placemarks?[0] {
+                    
+                    if let latitude = firstPlacemark.location?.coordinate.latitude,
+                        let longitude = firstPlacemark.location?.coordinate.longitude {
+                        
+                        let coordinates = [
+                            "latitude": "\(latitude)",
+                            "longitude": "\(longitude)"
+                        ]
+                        
+                        pluginResult = CDVPluginResult(
+                            status: CDVCommandStatus_OK,
+                            messageAs: coordinates
+                        )
+                    }
+                    else {
+                        
+                        pluginResult = CDVPluginResult(
+                            status: CDVCommandStatus_ERROR,
+                            messageAs: "Cannot get latitude and/or longitude"
+                        )
+                        
+                    }
+                }
+                else {
+                    
+                    pluginResult = CDVPluginResult(
+                        status: CDVCommandStatus_ERROR,
+                        messageAs: "Cannot find a location"
+                    )
+                    
+                }
+            }
+            else {
+                
+                pluginResult = CDVPluginResult(
+                    status: CDVCommandStatus_ERROR,
+                    messageAs: "CLGeocoder:geocodeAddressString Error"
+                )
+                
+            }
+            
+            self.commandDelegate!.send(
+                pluginResult,
+                callbackId: command.callbackId
+            )
+            
+        })
+        
+    }
+    else {
         
         pluginResult = CDVPluginResult(
             status: CDVCommandStatus_ERROR,
@@ -87,48 +152,6 @@ import CoreLocation
             callbackId: command.callbackId
         )
         
-        
-    } else {
-
-      CLGeocoder().geocodeAddressString(address, completionHandler: { placemarks, error in
-
-        if error == nil {
-          if let firstPlacemark = placemarks?[0] {
-            
-            let coordinates = [
-                "latitude": "\(firstPlacemark.location!.coordinate.latitude)",
-                "longitude": "\(firstPlacemark.location!.coordinate.longitude)"
-            ]
-            
-            pluginResult = CDVPluginResult(
-              status: CDVCommandStatus_OK,
-              messageAs: coordinates
-            )
-            
-          } else {
-            
-            pluginResult = CDVPluginResult(
-              status: CDVCommandStatus_ERROR,
-              messageAs: "Cannot get a location"
-            )
-            
-          }
-        } else {
-            
-          pluginResult = CDVPluginResult(
-            status: CDVCommandStatus_ERROR,
-            messageAs: "Cannot get a location"
-          )
-            
-        }
-        
-        self.commandDelegate!.send(
-            pluginResult,
-            callbackId: command.callbackId
-        )
-        
-      })    
     }
   }
-
 }

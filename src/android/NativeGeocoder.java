@@ -15,12 +15,12 @@ import java.util.Locale;
 
 public class NativeGeocoder extends CordovaPlugin {
     
-    Geocoder geocoder;
+    private Geocoder geocoder;
 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
-        System.out.print("NativeGeocoder initialize");
+        System.out.print("NativeGeocoder initialized");
     }
 
     @Override
@@ -45,75 +45,103 @@ public class NativeGeocoder extends CordovaPlugin {
 
     private void reverseGeocode(double latitude, double longitude, CallbackContext callbackContext) {
 
-        geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), Locale.getDefault());
+        if (latitude == 0 || longitude == 0) {
+            PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Expected two non-empty double arguments.");
+            callbackContext.sendPluginResult(r);
+            return;
+        }
 
-        if (!geocoder.isPresent()) {
+        if (!Geocoder.isPresent()) {
             PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Geocoder is not present on this device/emulator.");
             callbackContext.sendPluginResult(r);
             return;
         }
 
+        geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), Locale.getDefault());
+
         try {
             List<Address> geoResults = geocoder.getFromLocation(latitude, longitude, 1);
             if (geoResults.size() > 0) {
                 Address address = geoResults.get(0);
-                
+
+                // https://developer.android.com/reference/android/location/Address.html
                 JSONObject resultObj = new JSONObject();
-                resultObj.put("street", address.getThoroughfare());
-                resultObj.put("houseNumber", address.getSubThoroughfare());
-                resultObj.put("postalCode", address.getPostalCode());
-                resultObj.put("city", address.getLocality());
-                resultObj.put("district", address.getSubLocality());
-                resultObj.put("countryName", address.getCountryName());
                 resultObj.put("countryCode", address.getCountryCode());
+                resultObj.put("countryName", address.getCountryName());
+                resultObj.put("postalCode", address.getPostalCode());
+                resultObj.put("administrativeArea", address.getAdminArea());
+                resultObj.put("subAdministrativeArea", address.getSubAdminArea());
+                resultObj.put("locality", address.getLocality());
+                resultObj.put("subLocality", address.getSubLocality());
+                resultObj.put("thoroughfare", address.getThoroughfare());
+                resultObj.put("subThoroughfare", address.getSubThoroughfare());
 
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, resultObj));
             } else {
                 PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Cannot get an address.");
                 callbackContext.sendPluginResult(r);
             }
-        } catch (Exception e) {
-            PluginResult r = new PluginResult(PluginResult.Status.ERROR, e.getMessage());
+        }
+        catch (Exception e) {
+            PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Geocoder:getFromLocation Error: " + e.getMessage());
             callbackContext.sendPluginResult(r);
         }
     }
 
     private void forwardGeocode(String addressString, CallbackContext callbackContext) {
 
-        geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), Locale.getDefault());
-
-        if (!geocoder.isPresent()) {
+        if (!Geocoder.isPresent()) {
             PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Geocoder is not present on this device/emulator.");
             callbackContext.sendPluginResult(r);
             return;
         }
 
+        geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), Locale.getDefault());
+
         if (addressString != null && addressString.length() > 0) {
 
             try {
                 List<Address> geoResults = geocoder.getFromLocationName(addressString, 1);
-                if (geoResults.size()>0) {
+                if (geoResults.size() > 0) {
                     Address address = geoResults.get(0);
 
-                    JSONObject coordinates = new JSONObject();
-                    coordinates.put("latitude", address.getLatitude());
-                    coordinates.put("longitude", address.getLongitude());
+                    try {
+                        String latitude = String.valueOf(address.getLatitude());
+                        String longitude = String.valueOf(address.getLongitude());
 
-                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, coordinates));
-                } else {
-                    PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Cannot get a location.");
+                        if (latitude.isEmpty() || longitude.isEmpty()) {
+                            PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Cannot get latitude and/or longitude.");
+                            callbackContext.sendPluginResult(r);
+                            return;
+                        }
+
+                        JSONObject coordinates = new JSONObject();
+                        coordinates.put("latitude", latitude);
+                        coordinates.put("longitude", longitude);
+
+                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, coordinates));
+
+                    }
+                    catch (RuntimeException e) {
+                        PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Cannot get latitude and/or longitude.");
+                        callbackContext.sendPluginResult(r);
+                    }
+                }
+                else {
+                    PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Cannot find a location.");
                     callbackContext.sendPluginResult(r);
                 }
             
-            } catch (Exception e) {
-                PluginResult r = new PluginResult(PluginResult.Status.ERROR, e.getMessage());
+            }
+            catch (Exception e) {
+                PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Geocoder:getFromLocationName Error: " +e.getMessage());
                 callbackContext.sendPluginResult(r);
             }
             
-        } else {
+        }
+        else {
             PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Expected a non-empty string argument.");
             callbackContext.sendPluginResult(r);
         }
     }
-    
 }
