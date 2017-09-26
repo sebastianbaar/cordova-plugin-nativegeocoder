@@ -26,6 +26,8 @@
 
     <!-- ios -->
 	<platform name="ios">
+		<preference name="LOCATION_WHEN_IN_USE_DESCRIPTION" default="Use geocoder service" />
+
 		<config-file parent="/*" target="config.xml">
 			<feature name="NativeGeocoder">
 				<param name="ios-package" value="NativeGeocoder" />
@@ -37,7 +39,7 @@
         <framework src="CoreLocation.framework" />
         
         <config-file target="*-Info.plist" parent="NSLocationWhenInUseUsageDescription">
-            <string>Using geocoder service</string>
+            <string>$LOCATION_WHEN_IN_USE_DESCRIPTION</string>
         </config-file>
 
         <dependency id="cordova-plugin-add-swift-support" version="1.7.0"/>

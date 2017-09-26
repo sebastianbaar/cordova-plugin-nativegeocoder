@@ -9,6 +9,11 @@ cordova plugin add cordova-plugin-nativegeocoder
 ```
 The iOS part is written in Swift 3 and the [Swift support plugin](https://github.com/akofman/cordova-plugin-add-swift-support) is configured as a dependency.
 
+## Configuration
+You can also configure the following variable to customize the iOS location plist entry
+
+- `LOCATION_WHEN_IN_USE_DESCRIPTION` for `NSLocationWhenInUseUsageDescription` (defaults to "Use geocoder service")
+
 ## Supported Platforms
 - iOS
 - Android (works only on native devices)
