@@ -20,17 +20,16 @@ import CoreLocation
                     if let placemark = placemarks?[0] as CLPlacemark? {
                         
                         // https://developer.apple.com/documentation/corelocation/clplacemark
-                        let resultObj: Dictionary = [
-                            "countryCode": placemark.isoCountryCode ?? "",
-                            "countryName": placemark.country ?? "",
-                            "postalCode": placemark.postalCode ?? "",
-                            "administrativeArea": placemark.administrativeArea ?? "",
-                            "subAdministrativeArea": placemark.subAdministrativeArea ?? "",
-                            "locality": placemark.locality ?? "",
-                            "subLocality": placemark.subLocality ?? "",
-                            "thoroughfare": placemark.thoroughfare ?? "",
-                            "subThoroughfare": placemark.subThoroughfare ?? ""
-                        ]
+                        var resultObj: [String:String] = [:]
+                        resultObj["countryCode"] = placemark.isoCountryCode ?? ""
+                        resultObj["countryName"] = placemark.country ?? ""
+                        resultObj["postalCode"] = placemark.postalCode ?? ""
+                        resultObj["administrativeArea"] = placemark.administrativeArea ?? ""
+                        resultObj["subAdministrativeArea"] = placemark.subAdministrativeArea ?? ""
+                        resultObj["locality"] = placemark.locality ?? ""
+                        resultObj["subLocality"] = placemark.subLocality ?? ""
+                        resultObj["thoroughfare"] = placemark.thoroughfare ?? ""
+                        resultObj["subThoroughfare"] = placemark.subThoroughfare ?? ""
                         
                         pluginResult = CDVPluginResult(
                             status: CDVCommandStatus_OK,
@@ -95,10 +94,9 @@ import CoreLocation
                     if let latitude = firstPlacemark.location?.coordinate.latitude,
                         let longitude = firstPlacemark.location?.coordinate.longitude {
                         
-                        let coordinates = [
-                            "latitude": "\(latitude)",
-                            "longitude": "\(longitude)"
-                        ]
+                        var coordinates: [String:String] = [:]
+                        coordinates["latitude"] = "\(latitude)"
+                        coordinates["longitude"] = "\(longitude)"
                         
                         pluginResult = CDVPluginResult(
                             status: CDVCommandStatus_OK,

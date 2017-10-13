@@ -1,3 +1,7 @@
+# 2.0.4 (2017-10-13)
+
+fix Swift compiler issue (closes #10)
+
 # 2.0.3 (2017-09-26)
 
 Add configuration variable to customize the iOS location plist entry (closes #13)
