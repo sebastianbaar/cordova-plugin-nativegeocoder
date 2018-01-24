@@ -1,3 +1,7 @@
+# 2.0.5 (2017-10-13)
+
+update dependency 'cordova-plugin-add-swift-support' to 1.7.1 (closes #24)
+
 # 2.0.4 (2017-10-13)
 
 fix Swift compiler issue (closes #10)

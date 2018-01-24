@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-nativegeocoder",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Cordova plugin for native forward and reverse geocoding",
   "cordova": {
     "id": "cordova-plugin-nativegeocoder",
