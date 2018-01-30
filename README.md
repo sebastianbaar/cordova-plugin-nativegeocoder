@@ -3,6 +3,8 @@ Call `nativegeocoder.reverseGeocode()` to transform a latitude and longitude int
 
 > No need for creating API keys or querying external APIs
 
+**This plugin is also available for [Ionic Native](https://ionicframework.com/docs/native/native-geocoder/)**
+
 ## Installation
 ```
 cordova plugin add cordova-plugin-nativegeocoder
