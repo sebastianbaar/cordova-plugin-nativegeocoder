@@ -27,13 +27,14 @@ You can also configure the following variable to customize the iOS location plis
 ## nativegeocoder.reverseGeocode
 Reverse geocode a given latitude and longitude to find location address.
 
-    nativegeocoder.reverseGeocode(successCallback, errorCallback, latitude, longitude);
+    nativegeocoder.reverseGeocode(successCallback, errorCallback, latitude, longitude, options);
 
 ### Parameters
 - __latitude__: The latitude. (Double)
 - __longitude__: The longtitude. (Double)
+- __options__: The Options. ( { useLocale: boolean, maxResults: number } )
 
-### Result Object
+### Result Object (Array)
 https://developer.apple.com/documentation/corelocation/clplacemark
 https://developer.android.com/reference/android/location/Address.html
 
@@ -50,7 +51,7 @@ https://developer.android.com/reference/android/location/Address.html
 ```js
 nativegeocoder.reverseGeocode(success, failure, 52.5072095, 13.1452818);
 function success(result) {
-  alert("The address is: \n\n" + JSON.stringify(result));
+  alert("The address is: \n\n" + JSON.stringify(result[0]));
 }
 function failure(err) {
   alert(JSON.stringify(err));
@@ -60,12 +61,13 @@ function failure(err) {
 ## nativegeocoder.forwardGeocode
 Forward geocode a given address to find coordinates.
 
-    nativegeocoder.forwardGeocode(successCallback, errorCallback, addressString);
+    nativegeocoder.forwardGeocode(successCallback, errorCallback, addressString, options);
 
 ### Parameters
 - __addressString__: The address to be geocoded. (String)
+- __options__: The Options. ( { useLocale: boolean, maxResults: number } )
 
-### Result Object
+### Result Object (Array)
 - latitude
 - longitude
 
@@ -73,7 +75,7 @@ Forward geocode a given address to find coordinates.
 ```js
 nativegeocoder.forwardGeocode(success, failure, "Berlin");
 function success(coordinates) {
-  alert("The coordinates are latitude = " + coordinates.latitude + " and longitude = " + coordinates.longitude);
+  alert("The coordinates are latitude = " + coordinates[0].latitude + " and longitude = " + coordinates[0].longitude);
 }
 function failure(err) {
   alert(JSON.stringify(err));

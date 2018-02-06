@@ -2,19 +2,26 @@ package cordova.plugin.nativegeocoder;
 
 import android.location.Address;
 import android.location.Geocoder;
-import android.text.TextUtils;
 
-import org.apache.cordova.*;
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaInterface;
+import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.CordovaWebView;
+import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+class NativeGeocoderOptions {
+    boolean useLocale = true;
+    int maxResults = 1;
+}
+
 public class NativeGeocoder extends CordovaPlugin {
-    
+    private static int MAX_RESULTS_COUNT = 5;
     private Geocoder geocoder;
 
     @Override
@@ -29,21 +36,40 @@ public class NativeGeocoder extends CordovaPlugin {
         if (action.equals("reverseGeocode")) {
             double latitude = args.getDouble(0);
             double longitude = args.getDouble(1);
-            this.reverseGeocode(latitude, longitude, callbackContext);
+            JSONObject options = null;
+            try {
+                options = args.getJSONObject(2);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            this.reverseGeocode(latitude, longitude, options, callbackContext);
             return true;
         }
 
         if (action.equals("forwardGeocode")) {
             String addressString = args.getString(0);
-            this.forwardGeocode(addressString, callbackContext);
+            JSONObject options = null;
+            try {
+                options = args.getJSONObject(2);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            this.forwardGeocode(addressString, options, callbackContext);
             return true;
         }
 
         return false;
-        
     }
 
-    private void reverseGeocode(double latitude, double longitude, CallbackContext callbackContext) {
+    /**
+     * Reverse geocode a given latitude and longitude to find location address
+     * @param latitude
+     * @param longitude
+     * @param options
+     * @param callbackContext
+     */
+    private void reverseGeocode(double latitude, double longitude, JSONObject options, CallbackContext callbackContext) throws JSONException{
 
         if (latitude == 0 || longitude == 0) {
             PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Expected two non-empty double arguments.");
@@ -57,24 +83,54 @@ public class NativeGeocoder extends CordovaPlugin {
             return;
         }
 
-        geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), Locale.getDefault());
+        NativeGeocoderOptions geocoderOptions = new NativeGeocoderOptions();
+
+        if (options != null && options.has("useLocale")) {
+            geocoderOptions.useLocale = options.getBoolean("useLocale");
+        } else {
+            geocoderOptions.useLocale = true;
+        }
+        if (options != null && options.has("maxResults")) {
+            geocoderOptions.maxResults = options.getInt("maxResults");
+        } else {
+            geocoderOptions.maxResults = 1;
+        }
+
+        if (geocoderOptions.useLocale) {
+            geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), Locale.getDefault());
+        } else {
+            geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), Locale.ENGLISH);
+        }
+
+        if (geocoderOptions.maxResults > 0) {
+            geocoderOptions.maxResults = geocoderOptions.maxResults > MAX_RESULTS_COUNT ? MAX_RESULTS_COUNT : geocoderOptions.maxResults;
+        } else {
+            geocoderOptions.maxResults = 1;
+        }
 
         try {
-            List<Address> geoResults = geocoder.getFromLocation(latitude, longitude, 1);
+            List<Address> geoResults = geocoder.getFromLocation(latitude, longitude, geocoderOptions.maxResults);
             if (geoResults.size() > 0) {
-                Address address = geoResults.get(0);
+                int maxResultObjects = geoResults.size() >= geocoderOptions.maxResults ? geoResults.size() : geoResults.size();
+                JSONArray resultObj = new JSONArray();
 
-                // https://developer.android.com/reference/android/location/Address.html
-                JSONObject resultObj = new JSONObject();
-                resultObj.put("countryCode", address.getCountryCode());
-                resultObj.put("countryName", address.getCountryName());
-                resultObj.put("postalCode", address.getPostalCode());
-                resultObj.put("administrativeArea", address.getAdminArea());
-                resultObj.put("subAdministrativeArea", address.getSubAdminArea());
-                resultObj.put("locality", address.getLocality());
-                resultObj.put("subLocality", address.getSubLocality());
-                resultObj.put("thoroughfare", address.getThoroughfare());
-                resultObj.put("subThoroughfare", address.getSubThoroughfare());
+                for (int i = 0; i < maxResultObjects; i++) {
+                    Address address = geoResults.get(i);
+
+                    // https://developer.android.com/reference/android/location/Address.html
+                    JSONObject placemark = new JSONObject();
+                    placemark.put("countryCode", address.getCountryCode());
+                    placemark.put("countryName", address.getCountryName());
+                    placemark.put("postalCode", address.getPostalCode());
+                    placemark.put("administrativeArea", address.getAdminArea());
+                    placemark.put("subAdministrativeArea", address.getSubAdminArea());
+                    placemark.put("locality", address.getLocality());
+                    placemark.put("subLocality", address.getSubLocality());
+                    placemark.put("thoroughfare", address.getThoroughfare());
+                    placemark.put("subThoroughfare", address.getSubThoroughfare());
+
+                    resultObj.put(placemark);
+                }
 
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, resultObj));
             } else {
@@ -88,7 +144,19 @@ public class NativeGeocoder extends CordovaPlugin {
         }
     }
 
-    private void forwardGeocode(String addressString, CallbackContext callbackContext) {
+    /**
+     * Forward geocode a given address to find coordinates
+     * @param addressString
+     * @param options
+     * @param callbackContext
+     */
+    private void forwardGeocode(String addressString, JSONObject options, CallbackContext callbackContext) throws JSONException {
+
+        if (addressString == null || addressString.length() == 0) {
+            PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Expected a non-empty string argument.");
+            callbackContext.sendPluginResult(r);
+            return;
+        }
 
         if (!Geocoder.isPresent()) {
             PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Geocoder is not present on this device/emulator.");
@@ -96,52 +164,66 @@ public class NativeGeocoder extends CordovaPlugin {
             return;
         }
 
+        NativeGeocoderOptions geocoderOptions = new NativeGeocoderOptions();
+        geocoderOptions.useLocale = true;
+
+        if (options != null && options.has("maxResults")) {
+            geocoderOptions.maxResults = options.getInt("maxResults");
+        } else {
+            geocoderOptions.maxResults = 1;
+        }
+
         geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), Locale.getDefault());
 
-        if (addressString != null && addressString.length() > 0) {
+        if (geocoderOptions.maxResults > 0) {
+            geocoderOptions.maxResults = geocoderOptions.maxResults > MAX_RESULTS_COUNT ? MAX_RESULTS_COUNT : geocoderOptions.maxResults;
+        } else {
+            geocoderOptions.maxResults = 1;
+        }
 
-            try {
-                List<Address> geoResults = geocoder.getFromLocationName(addressString, 1);
-                if (geoResults.size() > 0) {
-                    Address address = geoResults.get(0);
+        try {
+            List<Address> geoResults = geocoder.getFromLocationName(addressString, geocoderOptions.maxResults);
+
+            if (geoResults.size() > 0) {
+                int maxResultObjects = geoResults.size() >= geocoderOptions.maxResults ? geoResults.size() : geoResults.size();
+                JSONArray resultObj = new JSONArray();
+
+                for (int i = 0; i < maxResultObjects; i++) {
+                    Address address = geoResults.get(i);
 
                     try {
                         String latitude = String.valueOf(address.getLatitude());
                         String longitude = String.valueOf(address.getLongitude());
 
-                        if (latitude.isEmpty() || longitude.isEmpty()) {
-                            PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Cannot get latitude and/or longitude.");
-                            callbackContext.sendPluginResult(r);
-                            return;
+                        if (!latitude.isEmpty() && !longitude.isEmpty()) {
+                            JSONObject coordinates = new JSONObject();
+                            coordinates.put("latitude", latitude);
+                            coordinates.put("longitude", longitude);
+
+                            resultObj.put(coordinates);
                         }
-
-                        JSONObject coordinates = new JSONObject();
-                        coordinates.put("latitude", latitude);
-                        coordinates.put("longitude", longitude);
-
-                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, coordinates));
-
                     }
                     catch (RuntimeException e) {
-                        PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Cannot get latitude and/or longitude.");
-                        callbackContext.sendPluginResult(r);
+                        e.printStackTrace();
                     }
                 }
-                else {
-                    PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Cannot find a location.");
+
+                if (resultObj.length() == 0) {
+                    PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Cannot get latitude and/or longitude.");
                     callbackContext.sendPluginResult(r);
+                } else {
+                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, resultObj));
                 }
-            
-            }
-            catch (Exception e) {
-                PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Geocoder:getFromLocationName Error: " +e.getMessage());
+
+            } else {
+                PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Cannot find a location.");
                 callbackContext.sendPluginResult(r);
             }
-            
         }
-        else {
-            PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Expected a non-empty string argument.");
+        catch (Exception e) {
+            PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Geocoder:getFromLocationName Error: " +e.getMessage());
             callbackContext.sendPluginResult(r);
         }
     }
+
 }

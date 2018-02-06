@@ -1,3 +1,14 @@
+# 3.0.0 (2018-02-06)
+
+For making the API more robust for future changes and new features I changed the return type of both methods to an array and added an 'options' param.
+
+## ** BREAKING CHANGES **
+- The result Object of __nativegeocoder.reverseGeocode__ is an Array.
+- The result Object of __nativegeocoder.forwardGeocode__ is an Array.
+
+## CHANGELOG
+- Add options param for both __nativegeocoder.reverseGeocode__ and __nativegeocoder.forwardGeocode__ for setting locale & max result objects (closes #17, #25)
+
 # 2.0.5 (2017-10-13)
 
 update dependency 'cordova-plugin-add-swift-support' to 1.7.1 (closes #24)
