@@ -49,7 +49,7 @@ https://developer.android.com/reference/android/location/Address.html
 
 ### Example
 ```js
-nativegeocoder.reverseGeocode(success, failure, 52.5072095, 13.1452818);
+nativegeocoder.reverseGeocode(success, failure, 52.5072095, 13.1452818, { useLocale: true, maxResults: 1 });
 function success(result) {
   alert("The address is: \n\n" + JSON.stringify(result[0]));
 }
@@ -73,7 +73,7 @@ Forward geocode a given address to find coordinates.
 
 ### Example
 ```js
-nativegeocoder.forwardGeocode(success, failure, "Berlin");
+nativegeocoder.forwardGeocode(success, failure, "Berlin", { useLocale: true, maxResults: 1 });
 function success(coordinates) {
   alert("The coordinates are latitude = " + coordinates[0].latitude + " and longitude = " + coordinates[0].longitude);
 }
