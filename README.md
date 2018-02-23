@@ -32,7 +32,14 @@ Reverse geocode a given latitude and longitude to find location address.
 ### Parameters
 - __latitude__: The latitude. (Double)
 - __longitude__: The longtitude. (Double)
-- __options__: The Options. ( { useLocale: boolean, maxResults: number } )
+- __options__: The Options
+
+```
+{ 
+  useLocale: boolean (default: true) ! only for Android and iOS 11.0+ !
+  maxResults: number (default: 1)    min-max: 1-5
+}
+```
 
 ### Result Object (Array)
 https://developer.apple.com/documentation/corelocation/clplacemark
@@ -65,7 +72,14 @@ Forward geocode a given address to find coordinates.
 
 ### Parameters
 - __addressString__: The address to be geocoded. (String)
-- __options__: The Options. ( { useLocale: boolean, maxResults: number } )
+- __options__: The Options.
+
+```
+{ 
+  useLocale: boolean (default: true) ! only for Android and iOS 11.0+ !
+  maxResults: number (default: 1)    min-max: 1-5
+}
+```
 
 ### Result Object (Array)
 - latitude
