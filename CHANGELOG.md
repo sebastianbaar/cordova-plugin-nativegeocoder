@@ -1,3 +1,7 @@
+# 3.1.0 (2018-02-26)
+
+Add 'defaultLocale' to options Object to set a default locale like 'fa-IR' or 'de_DE' (closes #26)
+
 # 3.0.0 (2018-02-06)
 
 For making the API more robust for future changes and new features I changed the return type of both methods to an array and added an 'options' param.

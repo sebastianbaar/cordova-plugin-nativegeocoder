@@ -23,6 +23,7 @@ struct NativeGeocoderError {
 
 struct NativeGeocoderOptions: Decodable {
     var useLocale: Bool = true
+    var defaultLocale: String?
     var maxResults: Int = 1
 }
 
@@ -45,11 +46,13 @@ struct NativeGeocoderOptions: Decodable {
             }
             
             let location = CLLocation(latitude: latitude, longitude: longitude)
-            var options = NativeGeocoderOptions(useLocale: true , maxResults: 1)
+            var options = NativeGeocoderOptions(useLocale: true, defaultLocale: nil, maxResults: 1)
             if let optionsDict = command.arguments[2] as? NSDictionary {
                 let useLocaleOption = optionsDict.value(forKey: "useLocale") as? Bool ?? true
+                let defaultLocaleOption = optionsDict.value(forKey: "defaultLocale") as? String
                 let maxResultsOption = optionsDict.value(forKey: "maxResults") as? Int ?? 1
                 options.useLocale = useLocaleOption
+                options.defaultLocale = defaultLocaleOption
                 options.maxResults = maxResultsOption
             }
             
@@ -77,6 +80,7 @@ struct NativeGeocoderOptions: Decodable {
     private func reverseGeocodeLocationHandler(_ location: CLLocation, options: NativeGeocoderOptions, completionHandler: @escaping ReverseGeocodeCompletionHandler) {
         var geocoderOptions = NativeGeocoderOptions()
         geocoderOptions.useLocale = options.useLocale
+        geocoderOptions.defaultLocale = options.defaultLocale
         if (options.maxResults > 0) {
             geocoderOptions.maxResults = options.maxResults > NativeGeocoder.MAX_RESULTS_COUNT ? NativeGeocoder.MAX_RESULTS_COUNT : options.maxResults
         } else {
@@ -85,10 +89,12 @@ struct NativeGeocoderOptions: Decodable {
         
         if #available(iOS 11, *) {
             var locale: Locale?
-            if (geocoderOptions.useLocale == false) {
+            if let defaultLocaleString = geocoderOptions.defaultLocale {
+                locale = Locale.init(identifier: defaultLocaleString)
+            } else if (geocoderOptions.useLocale == false) {
                 locale = Locale.init(identifier: "en_US")
             }
-            
+
             CLGeocoder().reverseGeocodeLocation(location, preferredLocale: locale, completionHandler: { [weak self] (placemarks, error) in
                 self?.createReverseGeocodeResult(placemarks, error, maxResults: geocoderOptions.maxResults, completionHandler: { (resultObj, error) in
                     completionHandler(resultObj, error)
@@ -138,8 +144,6 @@ struct NativeGeocoderOptions: Decodable {
     }
     
     
-    
-
     // MARK: - FORWARD GEOCODE
     @objc(forwardGeocode:)func forwardGeocode(_ command: CDVInvokedUrlCommand) {
         var pluginResult = CDVPluginResult(status: CDVCommandStatus_ERROR)
@@ -152,11 +156,13 @@ struct NativeGeocoderOptions: Decodable {
                 return
             }
             
-            var options = NativeGeocoderOptions(useLocale: true , maxResults: 1)
+            var options = NativeGeocoderOptions(useLocale: true, defaultLocale: nil, maxResults: 1)
             if let optionsDict = command.arguments[1] as? NSDictionary {
                 let useLocaleOption = optionsDict.value(forKey: "useLocale") as? Bool ?? true
+                let defaultLocaleOption = optionsDict.value(forKey: "defaultLocale") as? String
                 let maxResultsOption = optionsDict.value(forKey: "maxResults") as? Int ?? 1
                 options.useLocale = useLocaleOption
+                options.defaultLocale = defaultLocaleOption
                 options.maxResults = maxResultsOption
             }
             
@@ -184,17 +190,34 @@ struct NativeGeocoderOptions: Decodable {
     func forwardGeocodeHandler(_ address: String, options: NativeGeocoderOptions, completionHandler: @escaping ForwardGeocodeCompletionHandler) {
         var geocoderOptions = NativeGeocoderOptions()
         geocoderOptions.useLocale = options.useLocale
+        geocoderOptions.defaultLocale = options.defaultLocale
         if (options.maxResults > 0) {
             geocoderOptions.maxResults = options.maxResults > NativeGeocoder.MAX_RESULTS_COUNT ? NativeGeocoder.MAX_RESULTS_COUNT : options.maxResults
         } else {
             geocoderOptions.maxResults = 1
         }
         
-        CLGeocoder().geocodeAddressString(address, completionHandler: { [weak self] (placemarks, error) in
-            self?.createForwardGeocodeResult(placemarks, error, maxResults: geocoderOptions.maxResults, completionHandler: { (resultObj, error) in
-                completionHandler(resultObj, error)
+        if #available(iOS 11, *) {
+            var locale: Locale?
+            if let defaultLocaleString = geocoderOptions.defaultLocale {
+                locale = Locale.init(identifier: defaultLocaleString)
+            } else if (geocoderOptions.useLocale == false) {
+                locale = Locale.init(identifier: "en_US")
+            }
+            
+            CLGeocoder().geocodeAddressString(address, in: nil, preferredLocale: locale, completionHandler: { [weak self] (placemarks, error) in
+                self?.createForwardGeocodeResult(placemarks, error, maxResults: geocoderOptions.maxResults, completionHandler: { (resultObj, error) in
+                    completionHandler(resultObj, error)
+                })
             })
-        })
+        } else {
+            // fallback for < iOS 11
+            CLGeocoder().geocodeAddressString(address, completionHandler: { [weak self] (placemarks, error) in
+                self?.createForwardGeocodeResult(placemarks, error, maxResults: geocoderOptions.maxResults, completionHandler: { (resultObj, error) in
+                    completionHandler(resultObj, error)
+                })
+            })
+        }
     }
 
     private func createForwardGeocodeResult(_ placemarks: [CLPlacemark]?, _ error: Error?, maxResults: Int, completionHandler: @escaping ForwardGeocodeCompletionHandler) {

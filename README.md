@@ -36,8 +36,9 @@ Reverse geocode a given latitude and longitude to find location address.
 
 ```
 { 
-  useLocale: boolean (default: true) ! only for Android and iOS 11.0+ !
-  maxResults: number (default: 1)    min-max: 1-5
+  useLocale: boolean      (default: true)   (works only for Android and iOS 11.0+)
+  defaultLocale: string                     (e.g.: 'fa-IR' or 'de_DE'; works only for Android and iOS 11.0+)
+  maxResults: number      (default: 1)      (min-max: 1-5)
 }
 ```
 
@@ -76,8 +77,9 @@ Forward geocode a given address to find coordinates.
 
 ```
 { 
-  useLocale: boolean (default: true) ! only for Android and iOS 11.0+ !
-  maxResults: number (default: 1)    min-max: 1-5
+  useLocale: boolean      (default: true)   (works only for Android and iOS 11.0+)
+  defaultLocale: string                     (e.g.: 'fa-IR' or 'de_DE'; works only for Android and iOS 11.0+)
+  maxResults: number      (default: 1)      (min-max: 1-5)
 }
 ```
 

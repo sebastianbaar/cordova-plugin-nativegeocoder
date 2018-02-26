@@ -2,7 +2,7 @@ package cordova.plugin.nativegeocoder;
 
 import android.location.Address;
 import android.location.Geocoder;
-
+import android.os.Build;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
@@ -11,12 +11,12 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.List;
 import java.util.Locale;
 
 class NativeGeocoderOptions {
     boolean useLocale = true;
+    String defaultLocale = null;
     int maxResults = 1;
 }
 
@@ -51,7 +51,7 @@ public class NativeGeocoder extends CordovaPlugin {
             String addressString = args.getString(0);
             JSONObject options = null;
             try {
-                options = args.getJSONObject(2);
+                options = args.getJSONObject(1);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -84,22 +84,49 @@ public class NativeGeocoder extends CordovaPlugin {
         }
 
         NativeGeocoderOptions geocoderOptions = new NativeGeocoderOptions();
-
-        if (options != null && options.has("useLocale")) {
-            geocoderOptions.useLocale = options.getBoolean("useLocale");
+        if (options != null) {
+            if (options.has("useLocale")) {
+                geocoderOptions.useLocale = options.getBoolean("useLocale");
+            } else {
+                geocoderOptions.useLocale = true;
+            }
+            if (options.has("defaultLocale")) {
+                geocoderOptions.defaultLocale = options.getString("defaultLocale");
+            } else {
+                geocoderOptions.defaultLocale = null;
+            }
+            if (options.has("maxResults")) {
+                geocoderOptions.maxResults = options.getInt("maxResults");
+            } else {
+                geocoderOptions.maxResults = 1;
+            }
         } else {
             geocoderOptions.useLocale = true;
-        }
-        if (options != null && options.has("maxResults")) {
-            geocoderOptions.maxResults = options.getInt("maxResults");
-        } else {
+            geocoderOptions.defaultLocale = null;
             geocoderOptions.maxResults = 1;
         }
 
-        if (geocoderOptions.useLocale) {
-            geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), Locale.getDefault());
+        if (geocoderOptions.defaultLocale != null && !geocoderOptions.defaultLocale.isEmpty()) {
+            Locale locale;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                locale = Locale.forLanguageTag(geocoderOptions.defaultLocale);
+            } else {
+                locale = Locale.ENGLISH;
+                String parts[] = geocoderOptions.defaultLocale.split("-|_", -1);
+                if (parts.length == 1)
+                    locale = new Locale(parts[0]);
+                else if (parts.length == 2 || (parts.length == 3 && parts[2].startsWith("#")))
+                    locale = new Locale(parts[0], parts[1]);
+                else
+                    locale = new Locale(parts[0], parts[1], parts[2]);
+            }
+            geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), locale);
         } else {
-            geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), Locale.ENGLISH);
+            if (geocoderOptions.useLocale) {
+                geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), Locale.getDefault());
+            } else {
+                geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), Locale.ENGLISH);
+            }
         }
 
         if (geocoderOptions.maxResults > 0) {
@@ -165,15 +192,51 @@ public class NativeGeocoder extends CordovaPlugin {
         }
 
         NativeGeocoderOptions geocoderOptions = new NativeGeocoderOptions();
-        geocoderOptions.useLocale = true;
 
-        if (options != null && options.has("maxResults")) {
-            geocoderOptions.maxResults = options.getInt("maxResults");
+        if (options != null) {
+            if (options.has("useLocale")) {
+                geocoderOptions.useLocale = options.getBoolean("useLocale");
+            } else {
+                geocoderOptions.useLocale = true;
+            }
+            if (options.has("defaultLocale")) {
+                geocoderOptions.defaultLocale = options.getString("defaultLocale");
+            } else {
+                geocoderOptions.defaultLocale = null;
+            }
+            if (options.has("maxResults")) {
+                geocoderOptions.maxResults = options.getInt("maxResults");
+            } else {
+                geocoderOptions.maxResults = 1;
+            }
         } else {
+            geocoderOptions.useLocale = true;
+            geocoderOptions.defaultLocale = null;
             geocoderOptions.maxResults = 1;
         }
 
-        geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), Locale.getDefault());
+        if (geocoderOptions.defaultLocale != null && !geocoderOptions.defaultLocale.isEmpty()) {
+            Locale locale;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                locale = Locale.forLanguageTag(geocoderOptions.defaultLocale);
+            } else {
+                locale = Locale.ENGLISH;
+                String parts[] = geocoderOptions.defaultLocale.split("-|_", -1);
+                if (parts.length == 1)
+                    locale = new Locale(parts[0]);
+                else if (parts.length == 2 || (parts.length == 3 && parts[2].startsWith("#")))
+                    locale = new Locale(parts[0], parts[1]);
+                else
+                    locale = new Locale(parts[0], parts[1], parts[2]);
+            }
+            geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), locale);
+        } else {
+            if (geocoderOptions.useLocale) {
+                geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), Locale.getDefault());
+            } else {
+                geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), Locale.ENGLISH);
+            }
+        }
 
         if (geocoderOptions.maxResults > 0) {
             geocoderOptions.maxResults = geocoderOptions.maxResults > MAX_RESULTS_COUNT ? MAX_RESULTS_COUNT : geocoderOptions.maxResults;
@@ -225,5 +288,5 @@ public class NativeGeocoder extends CordovaPlugin {
             callbackContext.sendPluginResult(r);
         }
     }
-
+    
 }

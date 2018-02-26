@@ -40,5 +40,6 @@ NativeGeocoderForwardResult:
 
 NativeGeocoderOptions:
 - useLocale = true
+- defaultLocale
 - maxResults = 1
 */
