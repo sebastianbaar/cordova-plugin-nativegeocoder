@@ -1,3 +1,7 @@
+# 3.1.1 (2018-02-27)
+
+refactoring...
+
 # 3.1.0 (2018-02-26)
 
 Add 'defaultLocale' to options Object to set a default locale like 'fa-IR' or 'de_DE' (closes #26)

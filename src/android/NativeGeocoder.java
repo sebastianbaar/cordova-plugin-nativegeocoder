@@ -83,57 +83,8 @@ public class NativeGeocoder extends CordovaPlugin {
             return;
         }
 
-        NativeGeocoderOptions geocoderOptions = new NativeGeocoderOptions();
-        if (options != null) {
-            if (options.has("useLocale")) {
-                geocoderOptions.useLocale = options.getBoolean("useLocale");
-            } else {
-                geocoderOptions.useLocale = true;
-            }
-            if (options.has("defaultLocale")) {
-                geocoderOptions.defaultLocale = options.getString("defaultLocale");
-            } else {
-                geocoderOptions.defaultLocale = null;
-            }
-            if (options.has("maxResults")) {
-                geocoderOptions.maxResults = options.getInt("maxResults");
-            } else {
-                geocoderOptions.maxResults = 1;
-            }
-        } else {
-            geocoderOptions.useLocale = true;
-            geocoderOptions.defaultLocale = null;
-            geocoderOptions.maxResults = 1;
-        }
-
-        if (geocoderOptions.defaultLocale != null && !geocoderOptions.defaultLocale.isEmpty()) {
-            Locale locale;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                locale = Locale.forLanguageTag(geocoderOptions.defaultLocale);
-            } else {
-                locale = Locale.ENGLISH;
-                String parts[] = geocoderOptions.defaultLocale.split("-|_", -1);
-                if (parts.length == 1)
-                    locale = new Locale(parts[0]);
-                else if (parts.length == 2 || (parts.length == 3 && parts[2].startsWith("#")))
-                    locale = new Locale(parts[0], parts[1]);
-                else
-                    locale = new Locale(parts[0], parts[1], parts[2]);
-            }
-            geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), locale);
-        } else {
-            if (geocoderOptions.useLocale) {
-                geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), Locale.getDefault());
-            } else {
-                geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), Locale.ENGLISH);
-            }
-        }
-
-        if (geocoderOptions.maxResults > 0) {
-            geocoderOptions.maxResults = geocoderOptions.maxResults > MAX_RESULTS_COUNT ? MAX_RESULTS_COUNT : geocoderOptions.maxResults;
-        } else {
-            geocoderOptions.maxResults = 1;
-        }
+        NativeGeocoderOptions geocoderOptions = getNativeGeocoderOptions(options);
+        geocoder = createGeocoderWithOptions(geocoderOptions);
 
         try {
             List<Address> geoResults = geocoder.getFromLocation(latitude, longitude, geocoderOptions.maxResults);
@@ -171,6 +122,7 @@ public class NativeGeocoder extends CordovaPlugin {
         }
     }
 
+
     /**
      * Forward geocode a given address to find coordinates
      * @param addressString
@@ -178,7 +130,6 @@ public class NativeGeocoder extends CordovaPlugin {
      * @param callbackContext
      */
     private void forwardGeocode(String addressString, JSONObject options, CallbackContext callbackContext) throws JSONException {
-
         if (addressString == null || addressString.length() == 0) {
             PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Expected a non-empty string argument.");
             callbackContext.sendPluginResult(r);
@@ -191,58 +142,8 @@ public class NativeGeocoder extends CordovaPlugin {
             return;
         }
 
-        NativeGeocoderOptions geocoderOptions = new NativeGeocoderOptions();
-
-        if (options != null) {
-            if (options.has("useLocale")) {
-                geocoderOptions.useLocale = options.getBoolean("useLocale");
-            } else {
-                geocoderOptions.useLocale = true;
-            }
-            if (options.has("defaultLocale")) {
-                geocoderOptions.defaultLocale = options.getString("defaultLocale");
-            } else {
-                geocoderOptions.defaultLocale = null;
-            }
-            if (options.has("maxResults")) {
-                geocoderOptions.maxResults = options.getInt("maxResults");
-            } else {
-                geocoderOptions.maxResults = 1;
-            }
-        } else {
-            geocoderOptions.useLocale = true;
-            geocoderOptions.defaultLocale = null;
-            geocoderOptions.maxResults = 1;
-        }
-
-        if (geocoderOptions.defaultLocale != null && !geocoderOptions.defaultLocale.isEmpty()) {
-            Locale locale;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                locale = Locale.forLanguageTag(geocoderOptions.defaultLocale);
-            } else {
-                locale = Locale.ENGLISH;
-                String parts[] = geocoderOptions.defaultLocale.split("-|_", -1);
-                if (parts.length == 1)
-                    locale = new Locale(parts[0]);
-                else if (parts.length == 2 || (parts.length == 3 && parts[2].startsWith("#")))
-                    locale = new Locale(parts[0], parts[1]);
-                else
-                    locale = new Locale(parts[0], parts[1], parts[2]);
-            }
-            geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), locale);
-        } else {
-            if (geocoderOptions.useLocale) {
-                geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), Locale.getDefault());
-            } else {
-                geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), Locale.ENGLISH);
-            }
-        }
-
-        if (geocoderOptions.maxResults > 0) {
-            geocoderOptions.maxResults = geocoderOptions.maxResults > MAX_RESULTS_COUNT ? MAX_RESULTS_COUNT : geocoderOptions.maxResults;
-        } else {
-            geocoderOptions.maxResults = 1;
-        }
+        NativeGeocoderOptions geocoderOptions = getNativeGeocoderOptions(options);
+        geocoder = createGeocoderWithOptions(geocoderOptions);
 
         try {
             List<Address> geoResults = geocoder.getFromLocationName(addressString, geocoderOptions.maxResults);
@@ -262,7 +163,6 @@ public class NativeGeocoder extends CordovaPlugin {
                             JSONObject coordinates = new JSONObject();
                             coordinates.put("latitude", latitude);
                             coordinates.put("longitude", longitude);
-
                             resultObj.put(coordinates);
                         }
                     }
@@ -288,5 +188,76 @@ public class NativeGeocoder extends CordovaPlugin {
             callbackContext.sendPluginResult(r);
         }
     }
-    
+
+    /**
+     * Get a valid NativeGeocoderOptions object
+     * @param options
+     * @return NativeGeocoderOptions
+     */
+    private NativeGeocoderOptions getNativeGeocoderOptions(JSONObject options) throws JSONException {
+        NativeGeocoderOptions geocoderOptions = new NativeGeocoderOptions();
+
+        if (options != null) {
+            if (options.has("useLocale")) {
+                geocoderOptions.useLocale = options.getBoolean("useLocale");
+            } else {
+                geocoderOptions.useLocale = true;
+            }
+            if (options.has("defaultLocale")) {
+                geocoderOptions.defaultLocale = options.getString("defaultLocale");
+            } else {
+                geocoderOptions.defaultLocale = null;
+            }
+            if (options.has("maxResults")) {
+                geocoderOptions.maxResults = options.getInt("maxResults");
+
+                if (geocoderOptions.maxResults > 0) {
+                    geocoderOptions.maxResults = geocoderOptions.maxResults > MAX_RESULTS_COUNT ? MAX_RESULTS_COUNT : geocoderOptions.maxResults;
+                } else {
+                    geocoderOptions.maxResults = 1;
+                }
+
+            } else {
+                geocoderOptions.maxResults = 1;
+            }
+        } else {
+            geocoderOptions.useLocale = true;
+            geocoderOptions.defaultLocale = null;
+            geocoderOptions.maxResults = 1;
+        }
+
+        return geocoderOptions;
+    }
+
+    /**
+     * Create a Geocoder with NativeGeocoderOptions
+     * @param geocoderOptions
+     * @return Geocoder
+     */
+    private Geocoder createGeocoderWithOptions(NativeGeocoderOptions geocoderOptions) {
+        if (geocoderOptions.defaultLocale != null && !geocoderOptions.defaultLocale.isEmpty()) {
+            Locale locale;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                locale = Locale.forLanguageTag(geocoderOptions.defaultLocale);
+            } else {
+                locale = Locale.ENGLISH;
+                String parts[] = geocoderOptions.defaultLocale.split("-|_", -1);
+                if (parts.length == 1)
+                    locale = new Locale(parts[0]);
+                else if (parts.length == 2 || (parts.length == 3 && parts[2].startsWith("#")))
+                    locale = new Locale(parts[0], parts[1]);
+                else
+                    locale = new Locale(parts[0], parts[1], parts[2]);
+            }
+            geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), locale);
+        } else {
+            if (geocoderOptions.useLocale) {
+                geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), Locale.getDefault());
+            } else {
+                geocoder = new Geocoder(cordova.getActivity().getApplicationContext(), Locale.ENGLISH);
+            }
+        }
+        return geocoder;
+    }
+
 }

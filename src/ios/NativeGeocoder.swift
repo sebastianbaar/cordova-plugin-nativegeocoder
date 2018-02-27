@@ -78,14 +78,7 @@ struct NativeGeocoderOptions: Decodable {
     }
     
     private func reverseGeocodeLocationHandler(_ location: CLLocation, options: NativeGeocoderOptions, completionHandler: @escaping ReverseGeocodeCompletionHandler) {
-        var geocoderOptions = NativeGeocoderOptions()
-        geocoderOptions.useLocale = options.useLocale
-        geocoderOptions.defaultLocale = options.defaultLocale
-        if (options.maxResults > 0) {
-            geocoderOptions.maxResults = options.maxResults > NativeGeocoder.MAX_RESULTS_COUNT ? NativeGeocoder.MAX_RESULTS_COUNT : options.maxResults
-        } else {
-            geocoderOptions.maxResults = 1
-        }
+        let geocoderOptions = getNativeGeocoderOptions(from: options)
         
         if #available(iOS 11, *) {
             var locale: Locale?
@@ -188,14 +181,7 @@ struct NativeGeocoderOptions: Decodable {
     }
     
     func forwardGeocodeHandler(_ address: String, options: NativeGeocoderOptions, completionHandler: @escaping ForwardGeocodeCompletionHandler) {
-        var geocoderOptions = NativeGeocoderOptions()
-        geocoderOptions.useLocale = options.useLocale
-        geocoderOptions.defaultLocale = options.defaultLocale
-        if (options.maxResults > 0) {
-            geocoderOptions.maxResults = options.maxResults > NativeGeocoder.MAX_RESULTS_COUNT ? NativeGeocoder.MAX_RESULTS_COUNT : options.maxResults
-        } else {
-            geocoderOptions.maxResults = 1
-        }
+        let geocoderOptions = getNativeGeocoderOptions(from: options)
         
         if #available(iOS 11, *) {
             var locale: Locale?
@@ -248,6 +234,19 @@ struct NativeGeocoderOptions: Decodable {
         else {
             completionHandler(nil, NativeGeocoderError(message: "Cannot find a location"))
         }
+    }
+    
+    // MARK: - Helper
+    private func getNativeGeocoderOptions(from options: NativeGeocoderOptions) -> NativeGeocoderOptions {
+        var geocoderOptions = NativeGeocoderOptions()
+        geocoderOptions.useLocale = options.useLocale
+        geocoderOptions.defaultLocale = options.defaultLocale
+        if (options.maxResults > 0) {
+            geocoderOptions.maxResults = options.maxResults > NativeGeocoder.MAX_RESULTS_COUNT ? NativeGeocoder.MAX_RESULTS_COUNT : options.maxResults
+        } else {
+            geocoderOptions.maxResults = 1
+        }
+        return geocoderOptions
     }
 
 }
