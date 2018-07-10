@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<plugin id="cordova-plugin-nativegeocoder" version="3.1.1" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+<plugin id="cordova-plugin-nativegeocoder" version="3.1.2" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
 	<name>NativeGeocoder</name>
     <description>Cordova plugin for native forward and reverse geocoding</description>
     <license>MIT</license>
-    <keywords>cordova,geocoding,reverse,forward</keywords>
+    <keywords>cordova,geocoder,geocoding,reverse,forward,location</keywords>
 
 	<js-module name="NativeGeocoder" src="www/NativeGeocoder.js">
 		<clobbers target="nativegeocoder" />
@@ -19,6 +19,7 @@
 
 		<config-file parent="/*" target="AndroidManifest.xml">
             <uses-permission android:name="android.permission.INTERNET" />
+			<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
         </config-file>
 
         <source-file src="src/android/NativeGeocoder.java" target-dir="src/cordova/plugin/nativegeocoder" />

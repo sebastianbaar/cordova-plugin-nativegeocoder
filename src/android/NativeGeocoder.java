@@ -1,7 +1,10 @@
 package cordova.plugin.nativegeocoder;
 
+import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
@@ -21,7 +24,6 @@ class NativeGeocoderOptions {
 }
 
 public class NativeGeocoder extends CordovaPlugin {
-    private static int MAX_RESULTS_COUNT = 5;
     private Geocoder geocoder;
 
     @Override
@@ -64,10 +66,10 @@ public class NativeGeocoder extends CordovaPlugin {
 
     /**
      * Reverse geocode a given latitude and longitude to find location address
-     * @param latitude
-     * @param longitude
-     * @param options
-     * @param callbackContext
+     * @param latitude double
+     * @param longitude double
+     * @param options JSONObject
+     * @param callbackContext CallbackContext
      */
     private void reverseGeocode(double latitude, double longitude, JSONObject options, CallbackContext callbackContext) throws JSONException{
 
@@ -117,7 +119,11 @@ public class NativeGeocoder extends CordovaPlugin {
             }
         }
         catch (Exception e) {
-            PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Geocoder:getFromLocation Error: " + e.getMessage());
+            String errorMsg = e.getMessage();
+            if (e.getMessage().equals("grpc failed") && !isNetworkAvailable()) {
+                errorMsg = "No Internet Access";
+            }
+            PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Geocoder:getFromLocationName Error: " + errorMsg);
             callbackContext.sendPluginResult(r);
         }
     }
@@ -125,9 +131,9 @@ public class NativeGeocoder extends CordovaPlugin {
 
     /**
      * Forward geocode a given address to find coordinates
-     * @param addressString
-     * @param options
-     * @param callbackContext
+     * @param addressString String
+     * @param options JSONObject
+     * @param callbackContext CallbackContext
      */
     private void forwardGeocode(String addressString, JSONObject options, CallbackContext callbackContext) throws JSONException {
         if (addressString == null || addressString.length() == 0) {
@@ -184,25 +190,39 @@ public class NativeGeocoder extends CordovaPlugin {
             }
         }
         catch (Exception e) {
-            PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Geocoder:getFromLocationName Error: " +e.getMessage());
+            String errorMsg = e.getMessage();
+            if (e.getMessage().equals("grpc failed") && !isNetworkAvailable()) {
+                errorMsg = "No Internet Access";
+            }
+            PluginResult r = new PluginResult(PluginResult.Status.ERROR, "Geocoder:getFromLocationName Error: " + errorMsg);
             callbackContext.sendPluginResult(r);
         }
     }
 
     /**
+     * Get network connection
+     * @return boolean
+     */
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) cordova.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = null;
+        if (connectivityManager != null) {
+            activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        }
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    /**
      * Get a valid NativeGeocoderOptions object
-     * @param options
+     * @param options JSONObject
      * @return NativeGeocoderOptions
      */
     private NativeGeocoderOptions getNativeGeocoderOptions(JSONObject options) throws JSONException {
         NativeGeocoderOptions geocoderOptions = new NativeGeocoderOptions();
 
         if (options != null) {
-            if (options.has("useLocale")) {
-                geocoderOptions.useLocale = options.getBoolean("useLocale");
-            } else {
-                geocoderOptions.useLocale = true;
-            }
+            geocoderOptions.useLocale = !options.has("useLocale") || options.getBoolean("useLocale");
             if (options.has("defaultLocale")) {
                 geocoderOptions.defaultLocale = options.getString("defaultLocale");
             } else {
@@ -212,6 +232,7 @@ public class NativeGeocoder extends CordovaPlugin {
                 geocoderOptions.maxResults = options.getInt("maxResults");
 
                 if (geocoderOptions.maxResults > 0) {
+                    int MAX_RESULTS_COUNT = 5;
                     geocoderOptions.maxResults = geocoderOptions.maxResults > MAX_RESULTS_COUNT ? MAX_RESULTS_COUNT : geocoderOptions.maxResults;
                 } else {
                     geocoderOptions.maxResults = 1;
@@ -231,7 +252,7 @@ public class NativeGeocoder extends CordovaPlugin {
 
     /**
      * Create a Geocoder with NativeGeocoderOptions
-     * @param geocoderOptions
+     * @param geocoderOptions NativeGeocoderOptions
      * @return Geocoder
      */
     private Geocoder createGeocoderWithOptions(NativeGeocoderOptions geocoderOptions) {
@@ -241,7 +262,7 @@ public class NativeGeocoder extends CordovaPlugin {
                 locale = Locale.forLanguageTag(geocoderOptions.defaultLocale);
             } else {
                 locale = Locale.ENGLISH;
-                String parts[] = geocoderOptions.defaultLocale.split("-|_", -1);
+                String parts[] = geocoderOptions.defaultLocale.split("[-_]", -1);
                 if (parts.length == 1)
                     locale = new Locale(parts[0]);
                 else if (parts.length == 2 || (parts.length == 3 && parts[2].startsWith("#")))

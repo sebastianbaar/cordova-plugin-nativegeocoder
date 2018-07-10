@@ -1,3 +1,11 @@
+# 3.1.2 (2018-07-10)
+
+- Better handle 'grpc failed' error on Android (#21)
+    - add "No Internet Access" error if grpc failed because of no Internet connection
+    - add "android.permission.ACCESS_NETWORK_STATE" permission
+- update README
+- refactoring...
+
 # 3.1.1 (2018-02-27)
 
 refactoring...

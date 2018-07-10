@@ -18,82 +18,98 @@ You can also configure the following variable to customize the iOS location plis
 
 ## Supported Platforms
 - iOS
-- Android (works only on native devices)
+- Android
 
-## Methods
-- nativegeocoder.reverseGeocode
-- nativegeocoder.forwardGeocode
+## API
+- [.reverseGeocode(success, error, latitude, longitude, options)]()
+- [.forwardGeocode(success, error, addressString, options)]()
 
-## nativegeocoder.reverseGeocode
+## .reverseGeocode(successCallback, errorCallback, latitude, longitude, options);
 Reverse geocode a given latitude and longitude to find location address.
 
-    nativegeocoder.reverseGeocode(successCallback, errorCallback, latitude, longitude, options);
-
 ### Parameters
-- __latitude__: The latitude. (Double)
-- __longitude__: The longtitude. (Double)
-- __options__: The Options
 
-```
-{ 
-  useLocale: boolean      (default: true)   (works only for Android and iOS 11.0+)
-  defaultLocale: string                     (e.g.: 'fa-IR' or 'de_DE'; works only for Android and iOS 11.0+)
-  maxResults: number      (default: 1)      (min-max: 1-5)
-}
-```
+| Parameter        | Type       | Default | Description                                                   |
+| ---------------- | ---------- | ------- | ------------------------------------------------------------- |
+| `success` | `Function` |         | Success callback (with Array<Result>)              |
+| `error`   | `Function` |         | Error callback. |
+| `latitude` | `Number` |         | The latitude.               |
+| `longitude`   | `Number` |         | The longtitude. |
+| `options`   | `Object` |         | Optional. Is called when the api encounters an error while initializing the context. |
 
-### Result Object (Array)
-https://developer.apple.com/documentation/corelocation/clplacemark
-https://developer.android.com/reference/android/location/Address.html
+All available `options` attributes:
 
-- countryCode
-- postalCode
-- administrativeArea
-- subAdministrativeArea
-- locality
-- subLocality
-- thoroughfare
-- subThoroughfare
+| Attribute                      | Type     | Default                                                      | Comment                                        |
+| ------------------------------ | -------- | ------------------------------------------------------------ | -------------------------------------------------- |
+| `useLocale`  | `Boolean` | true | Optional. Only works for Android and iOS 11.0+. |
+| `defaultLocale` | `String` |  | Optional. E.g.: 'fa-IR' or 'de_DE'; works only for Android and iOS 11.0+. |
+| `maxResults` | `Number` | 1 | Optional. Min value: 1, max value: 5. |
+
+### Array<Result>
+Conforms to [Apple's](https://developer.apple.com/documentation/corelocation/clplacemark) and [Android's](https://developer.android.com/reference/android/location/Address.html) reverse geocoder's result arrays.
+
+| Value | Type     |
+|-------------|-----------
+| `countryCode`  | `String` | 
+| `postalCode`  | `String` | 
+| `administrativeArea`  | `String` | 
+| `subAdministrativeArea`  | `String` | 
+| `locality`  | `String` | 
+| `subLocality`  | `String` | 
+| `thoroughfare`  | `String` | 
+| `subThoroughfare`  | `String` | 
 
 ### Example
 ```js
 nativegeocoder.reverseGeocode(success, failure, 52.5072095, 13.1452818, { useLocale: true, maxResults: 1 });
+
 function success(result) {
-  alert("The address is: \n\n" + JSON.stringify(result[0]));
+  var firstResult = result[0];
+  console.log("First Result: " + JSON.stringify(firstResult));
 }
+
 function failure(err) {
-  alert(JSON.stringify(err));
+  console.log(err);
 }
 ```
 
-## nativegeocoder.forwardGeocode
+## .forwardGeocode(success, error, addressString, options)
 Forward geocode a given address to find coordinates.
 
-    nativegeocoder.forwardGeocode(successCallback, errorCallback, addressString, options);
-
 ### Parameters
-- __addressString__: The address to be geocoded. (String)
-- __options__: The Options.
 
-```
-{ 
-  useLocale: boolean      (default: true)   (works only for Android and iOS 11.0+)
-  defaultLocale: string                     (e.g.: 'fa-IR' or 'de_DE'; works only for Android and iOS 11.0+)
-  maxResults: number      (default: 1)      (min-max: 1-5)
-}
-```
+| Parameter        | Type       | Default | Description                                                   |
+| ---------------- | ---------- | ------- | ------------------------------------------------------------- |
+| `success` | `Function` |         | Success callback (with Array<Result>)              |
+| `error`   | `Function` |         | Error callback. |
+| `addressString` | `String` |         | The address to be geocoded.               |
+| `options`   | `Object` |         | Optional. Is called when the api encounters an error while initializing the context. |
 
-### Result Object (Array)
-- latitude
-- longitude
+All available `options` attributes:
+
+| Attribute                      | Type     | Default                                                      | Comment                                        |
+| ------------------------------ | -------- | ------------------------------------------------------------ | -------------------------------------------------- |
+| `useLocale`  | `Boolean` | true | Optional. Only works for Android and iOS 11.0+. |
+| `defaultLocale` | `String` |  | Optional. E.g.: 'fa-IR' or 'de_DE'; works only for Android and iOS 11.0+. |
+| `maxResults` | `Number` | 1 | Optional. Min value: 1, max value: 5. |
+
+### Array<Result>
+| Value | Type     |
+|-------------|-----------
+| `latitude`  | `String` | 
+| `longitude`  | `String` | 
+
 
 ### Example
 ```js
 nativegeocoder.forwardGeocode(success, failure, "Berlin", { useLocale: true, maxResults: 1 });
+
 function success(coordinates) {
-  alert("The coordinates are latitude = " + coordinates[0].latitude + " and longitude = " + coordinates[0].longitude);
+  var firstResult = coordinates[0];
+  console.log("The coordinates are latitude = " + firstResult.latitude + " and longitude = " + firstResult.longitude);
 }
+
 function failure(err) {
-  alert(JSON.stringify(err));
+  console.log(err);
 }
 ```
