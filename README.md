@@ -3,7 +3,11 @@ Call `nativegeocoder.reverseGeocode()` to transform a latitude and longitude int
 
 > No need for creating API keys or querying external APIs
 
-**This plugin is also available for [Ionic Native](https://ionicframework.com/docs/native/native-geocoder/)**
+
+**Please read [Known Issues](#known-issues) before posting an issue! Thank you!** :heart_eyes:
+
+
+This plugin is also available for **[Ionic Native](https://ionicframework.com/docs/native/native-geocoder/)**.
 
 ## Installation
 ```
@@ -113,3 +117,25 @@ function failure(err) {
   console.log(err);
 }
 ```
+
+## Known Issues
+
+### Android 
+
+#### Geocoder not working
+Errors like `Geocoder is not present on this device/emulator.`, `Geocoder [...] Error` or `Geocoder Service not available`.
+
+**Why?**: 
+The plugin checks for `Geocoder.isPresent()` ([Android docs](https://developer.android.com/reference/android/location/Geocoder.html#isPresent())). One reason for Geocoder not working on a device could be that you are running your app on an emulator or on a device without Google Play Services. But Geocoder API "[...] requires a backend service that is not included in the core android framework".
+
+**Any workaround?**: 
+Yes. Query [Google Maps Geocoding API](https://developers.google.com/maps/documentation/geocoding/start) as a backup if Geocoder is not present.
+
+**Can the plugin handle this?**: 
+No. I decided not to implement Google Maps Geocoding API as a backup because you have to add an [API key and more](https://developers.google.com/maps/documentation/geocoding/usage-and-billing). I want this plugin to remain as small and lightweight as possible.
+
+### iOS
+...
+
+## Thank you :heart:
+Yes you! Thank you very much for using cordova-plugin-nativegeocoder. If you have any feedback or run into issues using the plugin, please file an [issue](https://github.com/sebastianbaar/cordova-plugin-nativegeocoder/issues/new) on this repository.
