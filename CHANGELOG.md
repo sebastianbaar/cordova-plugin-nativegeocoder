@@ -1,3 +1,7 @@
+# 3.1.3 (2018-11-12)
+
+Android: return empty String if Address property is null (closes #34)
+
 # 3.1.2 (2018-07-10)
 
 - Better handle 'grpc failed' error on Android (#21)

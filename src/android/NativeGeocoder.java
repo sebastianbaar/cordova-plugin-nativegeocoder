@@ -99,15 +99,15 @@ public class NativeGeocoder extends CordovaPlugin {
 
                     // https://developer.android.com/reference/android/location/Address.html
                     JSONObject placemark = new JSONObject();
-                    placemark.put("countryCode", address.getCountryCode());
-                    placemark.put("countryName", address.getCountryName());
-                    placemark.put("postalCode", address.getPostalCode());
-                    placemark.put("administrativeArea", address.getAdminArea());
-                    placemark.put("subAdministrativeArea", address.getSubAdminArea());
-                    placemark.put("locality", address.getLocality());
-                    placemark.put("subLocality", address.getSubLocality());
-                    placemark.put("thoroughfare", address.getThoroughfare());
-                    placemark.put("subThoroughfare", address.getSubThoroughfare());
+                    placemark.put("countryCode", address.getCountryCode() != null ? address.getCountryCode() : "");
+                    placemark.put("countryName", address.getCountryName() != null ? address.getCountryName() : "");
+                    placemark.put("postalCode", address.getPostalCode() != null ? address.getPostalCode() : "");
+                    placemark.put("administrativeArea", address.getAdminArea() != null ? address.getAdminArea() : "");
+                    placemark.put("subAdministrativeArea", address.getSubAdminArea() != null ? address.getSubAdminArea() : "");
+                    placemark.put("locality", address.getLocality() != null ? address.getLocality() : "");
+                    placemark.put("subLocality", address.getSubLocality() != null ? address.getSubLocality() : "");
+                    placemark.put("thoroughfare", address.getThoroughfare() != null ? address.getThoroughfare() : "");
+                    placemark.put("subThoroughfare", address.getSubThoroughfare() != null ? address.getSubThoroughfare() : "");
 
                     resultObj.put(placemark);
                 }
