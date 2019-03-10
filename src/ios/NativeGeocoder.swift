@@ -1,6 +1,8 @@
 import CoreLocation
 
-struct NativeGeocoderReverseResult: Encodable {
+struct NativeGeocoderResult: Encodable {
+    var latitude: String?
+    var longitude: String?
     var countryCode: String?
     var countryName: String?
     var postalCode: String?
@@ -10,11 +12,7 @@ struct NativeGeocoderReverseResult: Encodable {
     var subLocality: String?
     var thoroughfare: String?
     var subThoroughfare: String?
-}
-
-struct NativeGeocoderForwardResult: Encodable {
-    var latitude: String?
-    var longitude: String?
+    var areasOfInterest: [String]?
 }
 
 struct NativeGeocoderError {
@@ -28,8 +26,8 @@ struct NativeGeocoderOptions: Decodable {
 }
 
 @objc(NativeGeocoder) class NativeGeocoder : CDVPlugin {
-    typealias ReverseGeocodeCompletionHandler = ([NativeGeocoderReverseResult]?, NativeGeocoderError?) -> Void
-    typealias ForwardGeocodeCompletionHandler = ([NativeGeocoderForwardResult]?, NativeGeocoderError?) -> Void
+    typealias ReverseGeocodeCompletionHandler = ([NativeGeocoderResult]?, NativeGeocoderError?) -> Void
+    typealias ForwardGeocodeCompletionHandler = ([NativeGeocoderResult]?, NativeGeocoderError?) -> Void
     private static let MAX_RESULTS_COUNT = 5
 
     // MARK: - REVERSE GEOCODE
@@ -111,11 +109,15 @@ struct NativeGeocoderOptions: Decodable {
         
         if let placemarks = placemarks {
             let maxResultObjects = placemarks.count >= maxResults ? maxResults : placemarks.count
-            var resultObj = [NativeGeocoderReverseResult]()
+            var resultObj = [NativeGeocoderResult]()
             
             for i in 0..<maxResultObjects {
                 // https://developer.apple.com/documentation/corelocation/clplacemark
-                let placemark = NativeGeocoderReverseResult(
+                let latitude = placemarks[i].location?.coordinate.latitude
+                let longitude = placemarks[i].location?.coordinate.longitude
+                let placemark = NativeGeocoderResult(
+                    latitude: (latitude != nil) ? "\(String(describing: latitude))" : "",
+                    longitude: (longitude != nil) ? "\(String(describing: longitude))" : "",
                     countryCode: placemarks[i].isoCountryCode ?? "",
                     countryName: placemarks[i].country ?? "",
                     postalCode: placemarks[i].postalCode ?? "",
@@ -124,7 +126,8 @@ struct NativeGeocoderOptions: Decodable {
                     locality: placemarks[i].locality ?? "",
                     subLocality: placemarks[i].subLocality ?? "",
                     thoroughfare: placemarks[i].thoroughfare ?? "",
-                    subThoroughfare: placemarks[i].subThoroughfare ?? ""
+                    subThoroughfare: placemarks[i].subThoroughfare ?? "",
+                    areasOfInterest: placemarks[i].areasOfInterest ?? []
                 )
                 resultObj.append(placemark)
             }
@@ -214,14 +217,28 @@ struct NativeGeocoderOptions: Decodable {
         
         if let placemarks = placemarks {
             let maxResultObjects = placemarks.count >= maxResults ? maxResults : placemarks.count
-            var resultObj = [NativeGeocoderForwardResult]()
+            var resultObj = [NativeGeocoderResult]()
             
             for i in 0..<maxResultObjects {
                 if let latitude = placemarks[i].location?.coordinate.latitude,
                     let longitude = placemarks[i].location?.coordinate.longitude {
                 
-                    let coordinates = NativeGeocoderForwardResult(latitude: "\(latitude)", longitude: "\(longitude)")
-                    resultObj.append(coordinates)
+                    // https://developer.apple.com/documentation/corelocation/clplacemark
+                    let placemark = NativeGeocoderResult(
+                        latitude: "\(latitude)",
+                        longitude: "\(longitude)",
+                        countryCode: placemarks[i].isoCountryCode ?? "",
+                        countryName: placemarks[i].country ?? "",
+                        postalCode: placemarks[i].postalCode ?? "",
+                        administrativeArea: placemarks[i].administrativeArea ?? "",
+                        subAdministrativeArea: placemarks[i].subAdministrativeArea ?? "",
+                        locality: placemarks[i].locality ?? "",
+                        subLocality: placemarks[i].subLocality ?? "",
+                        thoroughfare: placemarks[i].thoroughfare ?? "",
+                        subThoroughfare: placemarks[i].subThoroughfare ?? "",
+                        areasOfInterest: placemarks[i].areasOfInterest ?? []
+                    )
+                    resultObj.append(placemark)
                 }
             }
             

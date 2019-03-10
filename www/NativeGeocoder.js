@@ -2,7 +2,7 @@ var exec = require('cordova/exec');
 
 /**
  * Reverse geocode a given latitude and longitude to find location address.
- * @param {*} success {NativeGeocoderReverseResult[]} Success callback containing array of result objects
+ * @param {*} success {NativeGeocoderResult[]} Success callback containing array of result objects
  * @param {*} error Error callback
  * @param {*} latitude {number} The latitude
  * @param {*} longitude {number} The longitude
@@ -14,7 +14,7 @@ exports.reverseGeocode = function(success, error, latitude, longitude, options) 
 
 /**
  * Forward geocode a given address to find coordinates.
- * @param {*} success {NativeGeocoderForwardResult[]} Success callback containing array of result objects
+ * @param {*} success {NativeGeocoderResult[]} Success callback containing array of result objects
  * @param {*} error Error callback
  * @param {*} addressString {string} The address to be geocoded
  * @param {*} options {NativeGeocoderOptions} The options
@@ -24,7 +24,9 @@ exports.forwardGeocode = function(success, error, addressString, options) {
 };
 
 /*
-NativeGeocoderReverseResult:
+NativeGeocoderResult:
+- latitude
+- longitude
 - countryCode
 - postalCode
 - administrativeArea
@@ -33,10 +35,7 @@ NativeGeocoderReverseResult:
 - subLocality
 - thoroughfare
 - subThoroughfare
-
-NativeGeocoderForwardResult:
-- latitude
-- longitude
+- areasOfInterest
 
 NativeGeocoderOptions:
 - useLocale = true

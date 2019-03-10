@@ -99,6 +99,8 @@ public class NativeGeocoder extends CordovaPlugin {
 
                     // https://developer.android.com/reference/android/location/Address.html
                     JSONObject placemark = new JSONObject();
+                    placemark.put("latitude", !String.valueOf(address.getLatitude()).isEmpty() ? address.getLatitude() : "");
+                    placemark.put("longitude", !String.valueOf(address.getLongitude()).isEmpty() ? address.getLongitude() : "");
                     placemark.put("countryCode", address.getCountryCode() != null ? address.getCountryCode() : "");
                     placemark.put("countryName", address.getCountryName() != null ? address.getCountryName() : "");
                     placemark.put("postalCode", address.getPostalCode() != null ? address.getPostalCode() : "");
@@ -108,6 +110,7 @@ public class NativeGeocoder extends CordovaPlugin {
                     placemark.put("subLocality", address.getSubLocality() != null ? address.getSubLocality() : "");
                     placemark.put("thoroughfare", address.getThoroughfare() != null ? address.getThoroughfare() : "");
                     placemark.put("subThoroughfare", address.getSubThoroughfare() != null ? address.getSubThoroughfare() : "");
+                    placemark.put("areasOfInterest", address.getFeatureName() != null ? new JSONArray(new String[]{ address.getFeatureName()} ) : new JSONArray());
 
                     resultObj.put(placemark);
                 }
@@ -166,10 +169,22 @@ public class NativeGeocoder extends CordovaPlugin {
                         String longitude = String.valueOf(address.getLongitude());
 
                         if (!latitude.isEmpty() && !longitude.isEmpty()) {
-                            JSONObject coordinates = new JSONObject();
-                            coordinates.put("latitude", latitude);
-                            coordinates.put("longitude", longitude);
-                            resultObj.put(coordinates);
+                            // https://developer.android.com/reference/android/location/Address.html
+                            JSONObject placemark = new JSONObject();
+                            placemark.put("latitude", latitude);
+                            placemark.put("longitude", longitude);
+                            placemark.put("countryCode", address.getCountryCode() != null ? address.getCountryCode() : "");
+                            placemark.put("countryName", address.getCountryName() != null ? address.getCountryName() : "");
+                            placemark.put("postalCode", address.getPostalCode() != null ? address.getPostalCode() : "");
+                            placemark.put("administrativeArea", address.getAdminArea() != null ? address.getAdminArea() : "");
+                            placemark.put("subAdministrativeArea", address.getSubAdminArea() != null ? address.getSubAdminArea() : "");
+                            placemark.put("locality", address.getLocality() != null ? address.getLocality() : "");
+                            placemark.put("subLocality", address.getSubLocality() != null ? address.getSubLocality() : "");
+                            placemark.put("thoroughfare", address.getThoroughfare() != null ? address.getThoroughfare() : "");
+                            placemark.put("subThoroughfare", address.getSubThoroughfare() != null ? address.getSubThoroughfare() : "");
+                            placemark.put("areasOfInterest", address.getFeatureName() != null ? new JSONArray(new String[]{ address.getFeatureName() }) : new JSONArray());
+
+                            resultObj.put(placemark);
                         }
                     }
                     catch (RuntimeException e) {
@@ -261,7 +276,6 @@ public class NativeGeocoder extends CordovaPlugin {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 locale = Locale.forLanguageTag(geocoderOptions.defaultLocale);
             } else {
-                locale = Locale.ENGLISH;
                 String parts[] = geocoderOptions.defaultLocale.split("[-_]", -1);
                 if (parts.length == 1)
                     locale = new Locale(parts[0]);

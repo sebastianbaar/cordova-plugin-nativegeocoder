@@ -50,10 +50,12 @@ All available `options` attributes:
 | `maxResults` | `Number` | 1 | Optional. Min value: 1, max value: 5. |
 
 ### Array<Result>
-Conforms to [Apple's](https://developer.apple.com/documentation/corelocation/clplacemark) and [Android's](https://developer.android.com/reference/android/location/Address.html) reverse geocoder's result arrays.
+Conforms to [Apple's](https://developer.apple.com/documentation/corelocation/clplacemark) and [Android's](https://developer.android.com/reference/android/location/Address.html) geocoder's result arrays.
 
 | Value | Type     |
 |-------------|-----------
+| `latitude`  | `String` |
+| `longitude`  | `String` |
 | `countryCode`  | `String` | 
 | `postalCode`  | `String` | 
 | `administrativeArea`  | `String` | 
@@ -61,7 +63,8 @@ Conforms to [Apple's](https://developer.apple.com/documentation/corelocation/clp
 | `locality`  | `String` | 
 | `subLocality`  | `String` | 
 | `thoroughfare`  | `String` | 
-| `subThoroughfare`  | `String` | 
+| `subThoroughfare`  | `String` |
+| `areasOfInterest`  | `Array<String>` | 
 
 ### Example
 ```js
@@ -98,11 +101,21 @@ All available `options` attributes:
 | `maxResults` | `Number` | 1 | Optional. Min value: 1, max value: 5. |
 
 ### Array<Result>
+Conforms to [Apple's](https://developer.apple.com/documentation/corelocation/clplacemark) and [Android's](https://developer.android.com/reference/android/location/Address.html) geocoder's result arrays.
+
 | Value | Type     |
 |-------------|-----------
-| `latitude`  | `String` | 
-| `longitude`  | `String` | 
-
+| `latitude`  | `String` |
+| `longitude`  | `String` |
+| `countryCode`  | `String` | 
+| `postalCode`  | `String` | 
+| `administrativeArea`  | `String` | 
+| `subAdministrativeArea`  | `String` | 
+| `locality`  | `String` | 
+| `subLocality`  | `String` | 
+| `thoroughfare`  | `String` | 
+| `subThoroughfare`  | `String` |
+| `areasOfInterest`  | `Array<String>` | 
 
 ### Example
 ```js

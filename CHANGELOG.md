@@ -1,3 +1,14 @@
+# 3.2.0 (2019-03-10)
+
+- result array returns the same information for forward and reverse geocoding (closes #35)
+- result array return points of interest string array for iOS and Android (closes #38)
+    - results[0].areasOfInterest = ["Brandenburger Tor"]
+- update dependency 'cordova-plugin-add-swift-support' to 1.7.2
+
+## ** BREAKING CHANGES **
+- replace __NativeGeocoderForwardResult__ with __NativeGeocoderResult__
+- replace __NativeGeocoderReverseResult__ with __NativeGeocoderResult__
+
 # 3.1.3 (2018-11-12)
 
 Android: return empty String if Address property is null (closes #34)
