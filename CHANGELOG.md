@@ -1,3 +1,7 @@
+# 3.2.1 (2019-03-13)
+
+- iOS: fix Optionals for latitude and longitude in reverse geocoding
+
 # 3.2.0 (2019-03-10)
 
 - result array returns the same information for forward and reverse geocoding (closes #35)

@@ -113,11 +113,17 @@ struct NativeGeocoderOptions: Decodable {
             
             for i in 0..<maxResultObjects {
                 // https://developer.apple.com/documentation/corelocation/clplacemark
-                let latitude = placemarks[i].location?.coordinate.latitude
-                let longitude = placemarks[i].location?.coordinate.longitude
+                var latitude = ""
+                if let lat = placemarks[i].location?.coordinate.latitude {
+                    latitude = "\(lat)"
+                }
+                var longitude = ""
+                if let lon = placemarks[i].location?.coordinate.longitude {
+                    longitude = "\(lon)"
+                }
                 let placemark = NativeGeocoderResult(
-                    latitude: (latitude != nil) ? "\(String(describing: latitude))" : "",
-                    longitude: (longitude != nil) ? "\(String(describing: longitude))" : "",
+                    latitude: latitude,
+                    longitude: longitude,
                     countryCode: placemarks[i].isoCountryCode ?? "",
                     countryName: placemarks[i].country ?? "",
                     postalCode: placemarks[i].postalCode ?? "",
