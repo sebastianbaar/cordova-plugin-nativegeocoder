@@ -1,3 +1,8 @@
+# 3.2.2 (2019-04-14)
+
+- update cordova-plugin-add-swift-support to 2.0.2 (closes #45, thank you @DavidWiesner)
+- fix Android error logging (closes #44)
+
 # 3.2.1 (2019-03-13)
 
 - iOS: fix Optionals for latitude and longitude in reverse geocoding
