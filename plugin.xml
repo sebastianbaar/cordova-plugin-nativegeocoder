@@ -22,7 +22,16 @@
 			<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
         </config-file>
 
-        <source-file src="src/android/NativeGeocoder.java" target-dir="src/cordova/plugin/nativegeocoder" />
+		<config-file target="AndroidManifest.xml" parent="application">
+			<service
+					android:name="cordova.plugin.nativegeocoder.GeocodingIntentService.java"
+					android:exported="false"
+					android:enabled="true"
+			/>
+		</config-file>
+
+		<source-file src="src/android/NativeGeocoder.java" target-dir="src/cordova/plugin/nativegeocoder" />
+		<source-file src="src/android/GeocodingIntentService.java" target-dir="src/cordova/plugin/nativegeocoder" />
 	</platform>
 
     <!-- ios -->
