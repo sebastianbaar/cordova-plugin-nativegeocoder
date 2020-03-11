@@ -18,7 +18,6 @@ import org.json.JSONObject;
 
 
 public class NativeGeocoder extends CordovaPlugin {
-    private Geocoder geocoder;
 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
