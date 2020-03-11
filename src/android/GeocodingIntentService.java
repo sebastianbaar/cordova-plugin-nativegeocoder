@@ -51,7 +51,7 @@ public class GeocodingIntentService extends IntentService {
 
         try {
             if (location != null) {
-                backwardGeocode(mReceiver, location, geocoderOptions);
+                reverseGeocode(mReceiver, location, geocoderOptions);
             } else {
                 forwardGeocode(mReceiver, addressString, geocoderOptions);
             }
@@ -64,7 +64,13 @@ public class GeocodingIntentService extends IntentService {
         }
     }
 
-    private void backwardGeocode(ResultReceiver mReceiver, Location location, NativeGeocoderOptions geocoderOptions) throws IOException {
+    /**
+     * Reverse geocode a given location to find location address
+     * @param mReceiver ResultReceiver
+     * @param location Location
+     * @param geocoderOptions NativeGeocoderOptions
+     */
+    private void reverseGeocode(ResultReceiver mReceiver, Location location, NativeGeocoderOptions geocoderOptions) throws IOException {
         Geocoder geocoder = createGeocoderWithOptions(geocoderOptions);
         List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(),
                 geocoderOptions.maxResults);
@@ -76,6 +82,12 @@ public class GeocodingIntentService extends IntentService {
         }
     }
 
+    /**
+     * Forward geocode a given address to find coordinates
+     * @param mReceiver ResultReceiver
+     * @param addressString String
+     * @param geocoderOptions NativeGeocoderOptions
+     */
     private void forwardGeocode(ResultReceiver mReceiver, String addressString, NativeGeocoderOptions geocoderOptions) throws IOException {
         Geocoder geocoder = createGeocoderWithOptions(geocoderOptions);
         List<Address> addresses = geocoder.getFromLocationName(addressString, geocoderOptions.maxResults);
@@ -91,12 +103,25 @@ public class GeocodingIntentService extends IntentService {
         }
     }
 
+    /**
+     * Send the decoding result back to the receiver
+     * @param mReceiver ResultReceiver
+     * @param resultCode int
+     * @param message String
+     */
     private void deliverResultToReceiver(ResultReceiver mReceiver, int resultCode, String message) {
         Bundle bundle = new Bundle();
         bundle.putString(RESULT_DATA_KEY, message);
         mReceiver.send(resultCode, bundle);
     }
 
+    /**
+     * Convert a list of addresses to a JSONArray
+     * @param addresses List<Address>
+     * @param maxResults int
+     * @param skipEmptyLocationResults boolean
+     * @return JSONArray
+     */
     private JSONArray addressesToJSONArray(List<Address> addresses, int maxResults, boolean skipEmptyLocationResults) {
         JSONArray resultArray = new JSONArray();
         int maxResultObjects = addresses.size() >= maxResults ? maxResults : addresses.size();
