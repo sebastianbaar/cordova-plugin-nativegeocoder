@@ -24,7 +24,7 @@
 
 		<config-file target="AndroidManifest.xml" parent="application">
 			<service
-					android:name="cordova.plugin.nativegeocoder.GeocodingIntentService.java"
+					android:name="cordova.plugin.nativegeocoder.GeocodingIntentService"
 					android:exported="false"
 					android:enabled="true"
 			/>
