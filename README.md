@@ -13,7 +13,7 @@ This plugin is also available for **[Ionic Native](https://ionicframework.com/do
 ```
 cordova plugin add cordova-plugin-nativegeocoder
 ```
-The iOS part is written in Swift and the [Swift support plugin](https://github.com/akofman/cordova-plugin-add-swift-support) is configured as a dependency.
+**For iOS Cordova iOS version >5.0.0 is required.**
 
 ## Configuration
 You can also configure the following variable to customize the iOS location plist entry

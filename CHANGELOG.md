@@ -1,3 +1,11 @@
+# 3.3.0 (2020-03-25)
+
+- merge PR #54 "move Geocoding in an IntentService to not block the main thread" (closes #47, thank you @DavidWiesner)
+
+## ** BREAKING CHANGES **
+- remove dependency [Swift support plugin](https://github.com/akofman/cordova-plugin-add-swift-support); min Cordova iOS Version is now >5.0.0
+
+
 # 3.2.2 (2019-04-14)
 
 - update cordova-plugin-add-swift-support to 2.0.2 (closes #45, thank you @DavidWiesner)
