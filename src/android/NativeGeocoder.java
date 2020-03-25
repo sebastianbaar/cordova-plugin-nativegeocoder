@@ -34,7 +34,7 @@ public class NativeGeocoder extends CordovaPlugin {
             JSONObject options = null;
             try {
                 options = args.getJSONObject(2);
-            } catch (JSONException e) { }
+            } catch (JSONException ignored) { }
 
             this.reverseGeocode(latitude, longitude, options, callbackContext);
 
@@ -49,7 +49,7 @@ public class NativeGeocoder extends CordovaPlugin {
             JSONObject options = null;
             try {
                 options = args.getJSONObject(1);
-            } catch (JSONException e) { }
+            } catch (JSONException ignored) { }
             this.forwardGeocode(addressString, options, callbackContext);
 
             PluginResult r = new PluginResult(PluginResult.Status.NO_RESULT);
@@ -123,7 +123,7 @@ public class NativeGeocoder extends CordovaPlugin {
 
         private final CallbackContext callbackContext;
 
-        public AddressResultReceiver(CallbackContext callbackContext) {
+        AddressResultReceiver(CallbackContext callbackContext) {
             super(new Handler());
             this.callbackContext = callbackContext;
         }

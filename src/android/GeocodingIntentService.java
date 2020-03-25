@@ -124,7 +124,7 @@ public class GeocodingIntentService extends IntentService {
      */
     private JSONArray addressesToJSONArray(List<Address> addresses, int maxResults, boolean skipEmptyLocationResults) {
         JSONArray resultArray = new JSONArray();
-        int maxResultObjects = addresses.size() >= maxResults ? maxResults : addresses.size();
+        int maxResultObjects = Math.min(addresses.size(), maxResults);
 
         for (int i = 0; i < maxResultObjects; i++) {
             Address address = addresses.get(i);
@@ -152,9 +152,7 @@ public class GeocodingIntentService extends IntentService {
 
                     resultArray.put(placemark);
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (RuntimeException e) {
+            } catch (JSONException | RuntimeException e) {
                 e.printStackTrace();
             }
         }
@@ -184,7 +182,7 @@ public class GeocodingIntentService extends IntentService {
 
                     if (geocoderOptions.maxResults > 0) {
                         int MAX_RESULTS_COUNT = 5;
-                        geocoderOptions.maxResults = geocoderOptions.maxResults > MAX_RESULTS_COUNT ? MAX_RESULTS_COUNT : geocoderOptions.maxResults;
+                        geocoderOptions.maxResults = Math.min(geocoderOptions.maxResults, MAX_RESULTS_COUNT);
                     } else {
                         geocoderOptions.maxResults = 1;
                     }
@@ -230,7 +228,6 @@ public class GeocodingIntentService extends IntentService {
         }
     }
 
-
     /**
      * Get network connection
      *
@@ -244,6 +241,5 @@ public class GeocodingIntentService extends IntentService {
         }
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
-
 
 }
