@@ -7,7 +7,7 @@ Call `nativegeocoder.reverseGeocode()` to transform a latitude and longitude int
 **Please read [Known Issues](#known-issues) before posting an issue! Thank you!** :heart_eyes:
 
 
-This plugin is also available for **[Ionic Native](https://ionicframework.com/docs/native/native-geocoder/)**.
+This plugin is also available for **[Ionic Native](https://ionicframework.com/docs/native/native-geocoder/) & [Capacitor](https://ionicframework.com/docs/native/native-geocoder/)**.
 
 ## Installation
 ```
