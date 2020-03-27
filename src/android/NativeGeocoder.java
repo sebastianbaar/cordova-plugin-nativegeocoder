@@ -115,7 +115,7 @@ public class NativeGeocoder extends CordovaPlugin {
         Intent intent = new Intent(this.cordova.getActivity(), GeocodingIntentService.class);
         intent.putExtra(GeocodingIntentService.RECEIVER, new AddressResultReceiver(callbackContext));
         intent.putExtra(GeocodingIntentService.ADDRESS_STRING_DATA_EXTRA, addressString);
-        intent.putExtra(GeocodingIntentService.OPTIONS_DATA_EXTRA, options.toString());
+        intent.putExtra(GeocodingIntentService.OPTIONS_DATA_EXTRA, options != null ? options.toString() : null);
         this.cordova.getActivity().startService(intent);
     }
 

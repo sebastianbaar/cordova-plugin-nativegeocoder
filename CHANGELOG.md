@@ -1,3 +1,8 @@
+# 3.3.1 (2020-03-27)
+
+- closes #55
+
+
 # 3.3.0 (2020-03-25)
 
 - merge PR #54 "move Geocoding in an IntentService to not block the main thread" (closes #47, thank you @DavidWiesner)
