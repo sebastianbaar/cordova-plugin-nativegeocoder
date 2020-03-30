@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<plugin id="cordova-plugin-nativegeocoder" version="3.3.1" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+<plugin id="cordova-plugin-nativegeocoder" version="3.4.0" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
 	<name>NativeGeocoder</name>
     <description>Cordova plugin for native forward and reverse geocoding</description>
     <license>MIT</license>
@@ -22,16 +22,7 @@
 			<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
         </config-file>
 
-		<config-file target="AndroidManifest.xml" parent="application">
-			<service
-					android:name="cordova.plugin.nativegeocoder.GeocodingIntentService"
-					android:exported="false"
-					android:enabled="true"
-			/>
-		</config-file>
-
 		<source-file src="src/android/NativeGeocoder.java" target-dir="src/cordova/plugin/nativegeocoder" />
-		<source-file src="src/android/GeocodingIntentService.java" target-dir="src/cordova/plugin/nativegeocoder" />
 	</platform>
 
     <!-- ios -->

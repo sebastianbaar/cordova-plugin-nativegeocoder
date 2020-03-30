@@ -1,3 +1,7 @@
+# 3.4.0 (2020-03-30)
+
+- remove `IntentService` and use `cordova.getThreadPool()`
+
 # 3.3.1 (2020-03-27)
 
 - closes #55
