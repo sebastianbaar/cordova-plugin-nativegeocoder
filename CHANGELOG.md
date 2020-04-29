@@ -1,3 +1,6 @@
+# 3.4.1 (2020-04-29)
+- add cordova-plugin-add-swift-support to fix Swift version errors (closes #57)
+
 # 3.4.0 (2020-03-30)
 
 - remove `IntentService` and use `cordova.getThreadPool()`
