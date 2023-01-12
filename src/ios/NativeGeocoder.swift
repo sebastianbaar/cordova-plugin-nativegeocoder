@@ -25,19 +25,23 @@ struct NativeGeocoderOptions: Decodable {
     var maxResults: Int = 1
 }
 
-@objc(NativeGeocoder) class NativeGeocoder : CDVPlugin {
+@objc(NativeGeocoder) class NativeGeocoder: CDVPlugin {
+    private lazy var locationManager = CLLocationManager()
+    private lazy var geocoder = CLGeocoder()
     typealias ReverseGeocodeCompletionHandler = ([NativeGeocoderResult]?, NativeGeocoderError?) -> Void
     typealias ForwardGeocodeCompletionHandler = ([NativeGeocoderResult]?, NativeGeocoderError?) -> Void
     private static let MAX_RESULTS_COUNT = 5
-
+    
     // MARK: - REVERSE GEOCODE
     @objc(reverseGeocode:) func reverseGeocode(_ command: CDVInvokedUrlCommand) {
+        locationManager.requestWhenInUseAuthorization()
+        
         var pluginResult = CDVPluginResult(status: CDVCommandStatus_ERROR)
 
         if let latitude = command.arguments[0] as? Double,
             let longitude = command.arguments[1] as? Double {
             
-            if (CLGeocoder().isGeocoding) {
+            if (geocoder.isGeocoding) {
                 pluginResult = CDVPluginResult(status: CDVCommandStatus_ERROR, messageAs: "Geocoder is busy. Please try again later.")
                 self.commandDelegate!.send(pluginResult, callbackId: command.callbackId)
                 return
@@ -86,14 +90,14 @@ struct NativeGeocoderOptions: Decodable {
                 locale = Locale.init(identifier: "en_US")
             }
 
-            CLGeocoder().reverseGeocodeLocation(location, preferredLocale: locale, completionHandler: { [weak self] (placemarks, error) in
+            geocoder.reverseGeocodeLocation(location, preferredLocale: locale, completionHandler: { [weak self] (placemarks, error) in
                 self?.createReverseGeocodeResult(placemarks, error, maxResults: geocoderOptions.maxResults, completionHandler: { (resultObj, error) in
                     completionHandler(resultObj, error)
                 })
             })
         } else {
             // fallback for < iOS 11
-            CLGeocoder().reverseGeocodeLocation(location, completionHandler: { [weak self] (placemarks, error) in
+            geocoder.reverseGeocodeLocation(location, completionHandler: { [weak self] (placemarks, error) in
                 self?.createReverseGeocodeResult(placemarks, error, maxResults: geocoderOptions.maxResults, completionHandler: { (resultObj, error) in
                     completionHandler(resultObj, error)
                 })
@@ -148,11 +152,13 @@ struct NativeGeocoderOptions: Decodable {
     
     // MARK: - FORWARD GEOCODE
     @objc(forwardGeocode:)func forwardGeocode(_ command: CDVInvokedUrlCommand) {
+        locationManager.requestWhenInUseAuthorization()
+        
         var pluginResult = CDVPluginResult(status: CDVCommandStatus_ERROR)
         
         if let address = command.arguments[0] as? String {
             
-            if (CLGeocoder().isGeocoding) {
+            if (geocoder.isGeocoding) {
                 pluginResult = CDVPluginResult(status: CDVCommandStatus_ERROR, messageAs: "Geocoder is busy. Please try again later.")
                 self.commandDelegate!.send(pluginResult, callbackId: command.callbackId)
                 return
@@ -200,14 +206,14 @@ struct NativeGeocoderOptions: Decodable {
                 locale = Locale.init(identifier: "en_US")
             }
             
-            CLGeocoder().geocodeAddressString(address, in: nil, preferredLocale: locale, completionHandler: { [weak self] (placemarks, error) in
+            geocoder.geocodeAddressString(address, in: nil, preferredLocale: locale, completionHandler: { [weak self] (placemarks, error) in
                 self?.createForwardGeocodeResult(placemarks, error, maxResults: geocoderOptions.maxResults, completionHandler: { (resultObj, error) in
                     completionHandler(resultObj, error)
                 })
             })
         } else {
             // fallback for < iOS 11
-            CLGeocoder().geocodeAddressString(address, completionHandler: { [weak self] (placemarks, error) in
+            geocoder.geocodeAddressString(address, completionHandler: { [weak self] (placemarks, error) in
                 self?.createForwardGeocodeResult(placemarks, error, maxResults: geocoderOptions.maxResults, completionHandler: { (resultObj, error) in
                     completionHandler(resultObj, error)
                 })
@@ -271,5 +277,4 @@ struct NativeGeocoderOptions: Decodable {
         }
         return geocoderOptions
     }
-
 }

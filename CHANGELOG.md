@@ -1,3 +1,8 @@
+# 3.5.0 (2023-01-12)
+- remove cordova-plugin-add-swift-support
+- (iOS) request location authorization if not set using `CLLocationManager`'s `requestWhenInUseAuthorization` function
+- (Android) add `addressLines` for android [Docs](https://developer.android.com/reference/android/location/Address#getAddressLine(int))
+
 # 3.4.1 (2020-04-29)
 - add cordova-plugin-add-swift-support to fix Swift version errors (closes #57)
 

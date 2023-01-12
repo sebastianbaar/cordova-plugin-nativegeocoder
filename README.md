@@ -8,7 +8,7 @@ Call `nativegeocoder.reverseGeocode()` to transform a latitude and longitude int
 
 ## Ionic
 
-This plugin is also available for **[Ionic Native](https://ionicframework.com/docs/native/native-geocoder/) & [Capacitor](https://ionicframework.com/docs/native/native-geocoder/)**.
+This plugin is also available for **Ionic [awesome-cordova-plugins](https://danielsogl.gitbook.io/awesome-cordova-plugins/native-geocoder/) & [Capacitor](https://capacitorjs.com)**.
 
 ## Installation
 ```
@@ -66,6 +66,8 @@ Conforms to [Apple's](https://developer.apple.com/documentation/corelocation/clp
 | `thoroughfare`  | `String` | 
 | `subThoroughfare`  | `String` |
 | `areasOfInterest`  | `Array<String>` | 
+| `addressLines` (Android only) | `Array<String>` | 
+
 
 ### Example
 ```js
@@ -117,6 +119,7 @@ Conforms to [Apple's](https://developer.apple.com/documentation/corelocation/clp
 | `thoroughfare`  | `String` | 
 | `subThoroughfare`  | `String` |
 | `areasOfInterest`  | `Array<String>` | 
+| `addressLines` (Android only) | `Array<String>` | 
 
 ### Example
 ```js
@@ -137,16 +140,13 @@ function failure(err) {
 ### Android 
 
 #### Geocoder not working
-Errors like `Geocoder is not present on this device/emulator.`, `Geocoder [...] Error` or `Geocoder Service not available`.
+Errors like `Geocoder:getFromLocationName Error: grpc failed`, `Geocoder is not present on this device/emulator.`, `Geocoder [...] Error` or `Geocoder Service not available`.
 
 **Why?**: 
 The plugin checks for `Geocoder.isPresent()` ([Android docs](https://developer.android.com/reference/android/location/Geocoder.html#isPresent())). One reason for Geocoder not working on a device could be that you are running your app on an emulator or on a device without Google Play Services. But Geocoder API "[...] requires a backend service that is not included in the core android framework".
 
 **Any workaround?**: 
-Yes. Query [Google Maps Geocoding API](https://developers.google.com/maps/documentation/geocoding/start) as a backup if Geocoder is not present.
-
-**Can the plugin handle this?**: 
-No. I decided not to implement Google Maps Geocoding API as a backup because you have to add an [API key and more](https://developers.google.com/maps/documentation/geocoding/usage-and-billing). I want this plugin to remain as small and lightweight as possible.
+Yes, install Google Play services. Open `SDK Tools` > Tab `SDK Tools` > install `Google Play services`.
 
 ### iOS
 ...
