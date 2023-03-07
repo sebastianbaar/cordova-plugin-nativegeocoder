@@ -1,3 +1,6 @@
+# 3.5.1 (2023-03-07)
+- closes #67
+
 # 3.5.0 (2023-01-12)
 - remove cordova-plugin-add-swift-support
 - (iOS) request location authorization if not set using `CLLocationManager`'s `requestWhenInUseAuthorization` function
